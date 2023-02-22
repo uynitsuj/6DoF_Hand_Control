@@ -3,7 +3,7 @@
 
 ![Control Flow](https://raw.githubusercontent.com/uynitsuj/Project_EECS452/main/Project%20Documents/ControlFlow.png?token=GHSAT0AAAAAAB5EFWMAJMU7KO7YBBWAIF62Y7WTKOQ)
 
-![System Architecture](https://raw.githubusercontent.com/uynitsuj/Project_EECS452/main/Project%20Documents/SystemArchitecture.png?token=GHSAT0AAAAAAB5EFWMBHDPJXDKFXVFMKAKMY7WTLLQ)
+![System Architecture](https://raw.githubusercontent.com/uynitsuj/Project_EECS452/main/Project%20Documents/SystemArchitecture.png?token=GHSAT0AAAAAAB5EFWMBXJ7QL7O2IK4KMJMYY7WTOZA)
 
 # 1. Dependencies
 
