@@ -1,6 +1,6 @@
 import cv2
 import mediapipe as mp
-import numpy as np
+from multiprocessing import Process
 
 
 class handTracker():
@@ -43,21 +43,34 @@ class handTracker():
                                 fontScale=2, color=(250, 225, 100))
         return lmlist
 
-    def plot3D(self):
-        if self.results.multi_hand_world_landmarks:
-            for lm in self.results.multi_hand_world_landmarks:
-                plot_landmarks(
-                    lm, self.mpHands.HAND_CONNECTIONS)
+    # def plot3D(self):
+    #     if self.results.multi_hand_world_landmarks:
+    #         for lm in self.results.multi_hand_world_landmarks:
+    #             plot_landmarks(
+    #                 lm, self.mpHands.HAND_CONNECTIONS)
 
-def main():
-    cap = cv2.VideoCapture(1)
+
+def update(capid):
     tracker = handTracker()
+    cap = cv2.VideoCapture(capid)
     while True:
-        success, image = cap.read()
+        _, image = cap.read()
         image = tracker.handsFinder(image)
         lmList = tracker.positionFinder(image)
         cv2.imshow("Video", image)
         cv2.waitKey(1)
+
+
+def main():
+    cap1 = 0
+    cap2 = 1
+    c1 = Process(target=update, args=(cap1,))
+    c2 = Process(target=update, args=(cap2,))
+    c1.start()
+    c2.start()
+
+    c1.join()
+    c2.join()
 
 
 if __name__ == "__main__":
