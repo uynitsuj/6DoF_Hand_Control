@@ -1,6 +1,8 @@
 # Stereo CV Hand-Control of a 6DoF Robotic Arm
 **Authors: Nick Farid, Jack Getty, James Wishart, Justin Yu** 
 
+![Control Flow](https://github.com/[username]/[reponame]/blob/[branch]/ControlFlow.jpg?raw=true)
+
 # 1. Dependencies
 
 > ### Python 3.10
