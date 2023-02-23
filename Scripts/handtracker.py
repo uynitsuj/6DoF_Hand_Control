@@ -1,9 +1,12 @@
+#!/usr/bin/env python3
+
 import cv2
 import mediapipe as mp
 import numpy as np
 
 
 class handTracker():
+    # MediaPipe hand tracking pipeline class
     def __init__(self, mode=False, maxHands=1, detectionCon=0.5, modelComplexity=1, trackCon=0.5):
         self.mode = mode
         self.maxHands = maxHands
@@ -15,7 +18,13 @@ class handTracker():
                                         self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
 
-    def handsFinder(self, image, draw=True):
+    def handsFinder(self, image, draw=True) -> cv2.VideoCapture:
+        """
+        Processes captured image and stores results in class object. 
+        :param image: cv2.VideoCapture object
+        :param draw: True to annotate image with landmarks and segments
+        :return: The captured image, possibly modified with annotations.
+        """
         imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imageRGB)
 
@@ -27,7 +36,14 @@ class handTracker():
                         image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
 
-    def positionFinder(self, image, handNo=0, draw=True):
+    def positionFinder(self, image, handNo=0, draw=True) -> list:
+        """
+        Finds pixel coordinate of the 21 landmarks and stores in a list.
+        :param image: cv2.VideoCapture object
+        :param handNo: Hand index
+        :param draw: True annotates image with landmarks and segments
+        :return: A list of landmarks in the format [[0,x,y],[1,x,y],...,[20,x,y]]
+        """
         lmlist = []
         if self.results.multi_hand_landmarks:
             Hand = self.results.multi_hand_landmarks[handNo]
@@ -42,23 +58,3 @@ class handTracker():
                     cv2.putText(image, txt, (30, 90), fontFace=cv2.FONT_HERSHEY_COMPLEX,
                                 fontScale=2, color=(250, 225, 100))
         return lmlist
-
-    def plot3D(self):
-        if self.results.multi_hand_world_landmarks:
-            for lm in self.results.multi_hand_world_landmarks:
-                plot_landmarks(
-                    lm, self.mpHands.HAND_CONNECTIONS)
-
-# def main():
-#     cap = cv2.VideoCapture(1)
-#     tracker = handTracker()
-#     while True:
-#         success, image = cap.read()
-#         image = tracker.handsFinder(image)
-#         lmList = tracker.positionFinder(image)
-#         cv2.imshow("Video", image)
-#         cv2.waitKey(1)
-
-
-# if __name__ == "__main__":
-#     main()

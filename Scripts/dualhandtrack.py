@@ -16,6 +16,13 @@ def update(capid, queue):
         cv2.waitKey(1)
 
 
+def do_stuff_with_landmarks(capid, queue):
+    while True:
+        print("Camera " + str(capid) + " landmarks:")
+        print(queue.get())
+        print("\n")
+
+
 def main():
     cap1 = 0  # device id for capture device 1
     cap2 = 1  # device id for capture device 1
@@ -23,17 +30,16 @@ def main():
     q2 = Queue()
     c1 = Process(target=update, args=(cap1, q1))
     c2 = Process(target=update, args=(cap2, q2))
+    w1 = Process(target=do_stuff_with_landmarks, args=(cap1, q1))
+    w2 = Process(target=do_stuff_with_landmarks, args=(cap2, q2))
     c1.start()
     c2.start()
-    while True:
-        print("Camera 1 landmarks:")
-        print(q1.get())
-        print("\n")
-        print("Camera 2 landmarks:")
-        print(q2.get())
-        print("\n")
+    w1.start()
+    w2.start()
     c1.join()
     c2.join()
+    w1.join()
+    w2.join()
 
 
 if __name__ == "__main__":
