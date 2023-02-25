@@ -10,9 +10,11 @@
 > ### Python 3.10
 Packages depend on the above specified version of python. (Mediapipe not yet supported on Python 3.11)
 
-> ### MediaPipe 0.9.1.0
+## Packages
+
+> ##### MediaPipe 0.9.1.0
+> ##### openCV 4.7.0
 Required for hand track pipeline.
 
-> ### openCV 4.7.0
-Required for hand track pipeline.
-
+> ##### pyqtgraph 0.13.1
+Required if running visulization scripts
