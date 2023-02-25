@@ -1,9 +1,9 @@
 # Stereo CV Hand-Control of a 6DoF Robotic Arm
 **Authors: Nick Farid, Jack Getty, James Wishart, Justin Yu** 
 
-![Control Flow](https://raw.githubusercontent.com/uynitsuj/Project_EECS452/main/Project%20Documents/ControlFlow.png?token=GHSAT0AAAAAAB5EFWMAA4UP3REA37CABT6YY7WTTNA)
+![Control Flow](https://raw.githubusercontent.com/uynitsuj/Project_EECS452/main/Project%20Documents/ControlFlow.png?raw=true)
 
-![System Architecture](https://raw.githubusercontent.com/uynitsuj/Project_EECS452/main/Project%20Documents/SystemArchitecture.png?token=GHSAT0AAAAAAB5EFWMBXJ7QL7O2IK4KMJMYY7WTOZA)
+![System Architecture](https://raw.githubusercontent.com/uynitsuj/Project_EECS452/main/Project%20Documents/SystemArchitecture.png?raw=true)
 
 # 1. Dependencies
 
