@@ -18,7 +18,7 @@ class handTracker():
                                         self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
 
-    def handsFinder(self, image, draw=True) -> cv2.VideoCapture:
+    def handsFinder(self, image: cv2.VideoCapture, draw=True) -> cv2.VideoCapture:
         """
         Processes captured image and stores results in class object. 
         :param image: cv2.VideoCapture object
@@ -36,13 +36,13 @@ class handTracker():
                         image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
 
-    def positionFinder(self, image, handNo=0, draw=True) -> list:
+    def positionFinder(self, image: cv2.VideoCapture, handNo=0, draw=True) -> list:
         """
-        Finds pixel coordinate of the 21 landmarks and stores in a list.
+        Finds pixel coordinate of the 21 landmarks and returns in a list.
         :param image: cv2.VideoCapture object
-        :param handNo: Hand index
-        :param draw: True annotates image with landmarks and segments
-        :return: A list of landmarks in the format [[0,x,y],[1,x,y],...,[20,x,y]]
+        :param handNo: Hand index TODO: Verify?
+        :param draw: if True, annotates image with landmarks and segments
+        :return: A list of 21 landmarks in the format [[0,x_0,y_0],[1,x_1,y_1],...,[20,x_20,y_20]]
         """
         lmlist = []
         if self.results.multi_hand_landmarks:
