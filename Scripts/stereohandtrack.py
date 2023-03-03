@@ -1,6 +1,7 @@
 import cv2
 from multiprocessing import Process, Queue
 import handtracker
+import cameracalibrate
 
 
 def update(capid, queue):

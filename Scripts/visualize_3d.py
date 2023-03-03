@@ -1,6 +1,7 @@
 import cv2
 from multiprocessing import Process, Queue
 import handtracker
+import Calibrate.cameracalibrate as cal
 import numpy as np
 from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph.opengl as gl
@@ -52,7 +53,7 @@ def stereo_process(queue1: Queue, queue2: Queue, queueout: Queue) -> None:
             break
 
 
-def updateHandTrack(capid: int, queue: Queue) -> None:
+def updateHandTrack(capid: int, queue: Queue, mtx, dist, newcameramtx, roi) -> None:
     """
     Update loop for hand tracker pipeline.
     Intended to be used in a multiprocessing Process callback.
@@ -63,6 +64,11 @@ def updateHandTrack(capid: int, queue: Queue) -> None:
     cap = cv2.VideoCapture(capid)
     while True:
         _, image = cap.read()
+
+        image = cv2.undistort(image, mtx, dist, None, newcameramtx)
+        x, y, w, h = roi
+        image = image[y:y+h, x:x+w]
+        image = cv2.flip(image, 0)
         image = tracker.handsFinder(image)
         lmList = tracker.positionFinder(image)
         queue.put(lmList)
@@ -76,9 +82,17 @@ def main():
     lm1 = Queue()  # landmarks for device 1
     lm2 = Queue()  # landmarks for device 2
     lm3d = Queue()  # 3d projection of landmarks
-    capture1 = Process(target=updateHandTrack, args=(cap1, lm1))
-    capture2 = Process(target=updateHandTrack, args=(cap2, lm2))
+    mtx, dist, rvecs, tvecs = cal.calibrate('./Calibrate/*.jpg')
+    w = 1280
+    h = 720
+    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(
+        mtx, dist, (w, h), 1, (w, h))
+    capture1 = Process(target=updateHandTrack, args=(
+        cap1, lm1, mtx, dist, newcameramtx, roi))
+    capture2 = Process(target=updateHandTrack, args=(
+        cap2, lm2, mtx, dist, newcameramtx, roi))
     lm_to_3d = Process(target=stereo_process, args=(lm1, lm2, lm3d))
+
     capture1.start()
     capture2.start()
     lm_to_3d.start()
