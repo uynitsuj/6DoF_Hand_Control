@@ -62,12 +62,12 @@ def calibrate(path: str):
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
         objpoints, imgpoints, gray.shape[::-1], None, None)
 
-    print("Camera matrix : \n")
-    print(mtx)
-    print("dist : \n")
-    print(dist)
-    print("rvecs : \n")
-    print(rvecs)
-    print("tvecs : \n")
-    print(tvecs)
+    # print("Camera matrix : \n")
+    # print(mtx)
+    # print("dist : \n")
+    # print(dist)
+    # print("rvecs : \n")
+    # print(rvecs)
+    # print("tvecs : \n")
+    # print(tvecs)
     return mtx, dist, rvecs, tvecs
