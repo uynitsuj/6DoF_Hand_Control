@@ -7,6 +7,7 @@ from FPS import FPS, now
 import argparse
 import os
 from openvino.inference_engine import IENetwork, IECore
+import pyrealsense2.pyrealsense2 as rs
 
 class HandTracker:
     def __init__(self, input_src=None,
@@ -33,9 +34,6 @@ class HandTracker:
             self.img = cv2.imread(input_src)
         else:
             self.image_mode = False
-            if input_src.isdigit():
-                input_src = int(input_src)
-            self.cap = cv2.VideoCapture(input_src)
     
         # Create SSD anchors 
         # https://github.com/google/mediapipe/blob/master/mediapipe/modules/palm_detection/palm_detection_cpu.pbtxt
@@ -307,9 +305,14 @@ class HandTracker:
             if self.image_mode:
                 vid_frame = self.img
             else:
-                ok, vid_frame = self.cap.read()
-                if not ok:
+                frames = pipeline.wait_for_frames()
+                depth_frame = frames.get_depth_frame()
+                vid_frame = frames.get_color_frame()
+                if not depth_frame or not color_frame:
                     break
+                # ok, vid_frame = self.cap.read()
+                # if not ok:
+                    # break
             h, w = vid_frame.shape[:2]
             if self.crop:
                 # Cropping the long side to get a square shape
@@ -385,6 +388,34 @@ class HandTracker:
         print(f"# hand landmark inferences  : {nb_lm_inferences}")
         print(f"Palm detection round trip   : {glob_pd_rtrip_time/nb_pd_inferences*1000:.1f} ms")
         print(f"Hand landmark round trip    : {glob_lm_rtrip_time/nb_lm_inferences*1000:.1f} ms")
+        
+def camera_setup():
+    pipeline = rs.pipeline()
+    config = rs.config
+    pipeline_wrapper = rs.pipeline_wrapper(pipeline)
+    pipeline_profile = config.resolve(pipeline_wrapper)
+    device = pipeline_profile.get_device()
+    device_product_line = str(device.get_info(rs.camera_info.product_line))
+    found_rgb = False
+    for s in device.sensors:
+        if s.get_info(rs.camera_info.name) == 'RGB Camera':
+            found_rgb = True
+            break
+    if not found_rgb:
+        print("The demo requires Depth camera with Color sensor")
+        exit(0)
+    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+
+    if device_product_line == 'L500':
+        config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
+    else:
+        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+
+    # Start streaming
+    pipeline.start(config)
+    # if input_src.isdigit():
+        # input_src = int(input_src)
+    # self.cap = cv2.VideoCapture(input_src)
            
 
 if __name__ == "__main__":
@@ -414,4 +445,5 @@ if __name__ == "__main__":
                     lm_device=args.lm_device,
                     use_gesture=args.gesture,
                     crop=args.crop)
+    camera_setup()
     ht.run()
