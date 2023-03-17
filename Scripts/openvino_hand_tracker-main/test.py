@@ -9,12 +9,13 @@ import pyrealsense2.pyrealsense2 as rs
 import numpy as np
 import cv2
 import mediapipe as mp
+import time as time
 
-fulposold = []
+fullposold = []
 decimation = rs.decimation_filter()
 
 class handTracker():
-    def __init__(self, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
+    def __init__(self, mode=False, maxHands=1, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -52,13 +53,15 @@ class handTracker():
     
 def main():
     # Configure depth and color streams
-    global fulposold
+    global fullposold
     global decimation
+    fullposold = []
     tracker = handTracker()
     pipeline = rs.pipeline()
     config = rs.config()
 
     # Get device product line for setting a supporting resolution
+
     pipeline_wrapper = rs.pipeline_wrapper(pipeline)
     pipeline_profile = config.resolve(pipeline_wrapper)
     device = pipeline_profile.get_device()
@@ -73,24 +76,35 @@ def main():
         print("The demo requires Depth camera with Color sensor")
         exit(0)
 
-    config.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 30)
+    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
 
     if device_product_line == 'L500':
         config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
     else:
-        config.enable_stream(rs.stream.color, 848, 480, rs.format.bgr8, 30)
+        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 
     # Start streaming
-    pipeline.start(config)
-
+    cfg = pipeline.start(config)
+    profile = cfg.get_stream(rs.stream.depth) # Fetch stream profile for depth stream
+    intr = profile.as_video_stream_profile().get_intrinsics()
+    align_to = rs.stream.depth
+    align = rs.align(align_to)
     try:
         while True:
 
             # Wait for a coherent pair of frames: depth and color
+            start = time.time()
             frames = pipeline.wait_for_frames()
-            depth_frame = frames.get_depth_frame()
-            color_frame = frames.get_color_frame()
+            
+            aligned_frames = align.process(frames)
+            depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
+            color_frame = aligned_frames.get_color_frame()
+            
+#             depth_frame = frames.get_depth_frame()
+#             color_frame = frames.get_color_frame()
             if not depth_frame or not color_frame:
+                end = time.time()
+                delta = end - start
                 continue
 
             # Convert images to numpy arrays
@@ -106,12 +120,12 @@ def main():
 #             depth_colormap_dim = depth_colormap.shape
 #             color_colormap_dim = color_image.shape
 # 
-#             # If depth and color resolutions are different, resize color image to match depth image for display
+            # If depth and color resolutions are different, resize color image to match depth image for display
 #             if depth_colormap_dim != color_colormap_dim:
 #                 resized_color_image = cv2.resize(color_image, dsize=(depth_colormap_dim[1], depth_colormap_dim[0]), interpolation=cv2.INTER_AREA)
-#                 images = np.hstack((resized_color_image, depth_colormap))
+# #                 images = np.hstack((resized_color_image, depth_colormap))
 #             else:
-#                 images = np.hstack((color_image, depth_colormap))
+#                 resized_color_image = color_image
                 
             image = tracker.handsFinder(color_image)
             lmList = tracker.positionFinder(image)
@@ -129,15 +143,19 @@ def main():
                         z = fullposold[xy[0]][2]
                     else:
                         z = 0
-                fullpos.append([xy[1], xy[2], z])
+                result = rs.rs2_deproject_pixel_to_point(intr, [xy[1], xy[2]], z)
+                fullpos.append([result[0], result[1], result[2]])
             if len(fullpos) != 0:
                 #print([depth_frame.get_width(), depth_frame.get_height()])
                 print(fullpos[0])
                 fullposold = fullpos
-                
+#                 cv2.circle(depth_colormap,(fullpos[0][0],fullpos[0][1]), 5 , (255,0,255), cv2.FILLED)
             cv2.imshow("Video",image)
             cv2.imshow("Depth",depth_colormap)
             #cv2.imshow("Dec Depth",dec_depth_colormap)
+            end = time.time()
+            delta = end - start
+            print(1/delta)
             cv2.waitKey(1)
 
     finally:
