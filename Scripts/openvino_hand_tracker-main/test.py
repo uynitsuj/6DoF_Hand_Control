@@ -8,8 +8,9 @@
 import pyrealsense2.pyrealsense2 as rs
 import numpy as np
 import cv2
-import cv2
 import mediapipe as mp
+
+fulposold = []
 
 class handTracker():
     def __init__(self, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
@@ -24,7 +25,7 @@ class handTracker():
         self.mpDraw = mp.solutions.drawing_utils
 
     def handsFinder(self,image,draw=True):
-        imageRGB = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+        imageRGB = image #cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imageRGB)
 
         if self.results.multi_hand_landmarks:
@@ -50,6 +51,7 @@ class handTracker():
     
 def main():
     # Configure depth and color streams
+    global fulposold
     tracker = handTracker()
     pipeline = rs.pipeline()
     config = rs.config()
@@ -96,15 +98,15 @@ def main():
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
 
-            depth_colormap_dim = depth_colormap.shape
-            color_colormap_dim = color_image.shape
-
-            # If depth and color resolutions are different, resize color image to match depth image for display
-            if depth_colormap_dim != color_colormap_dim:
-                resized_color_image = cv2.resize(color_image, dsize=(depth_colormap_dim[1], depth_colormap_dim[0]), interpolation=cv2.INTER_AREA)
-                images = np.hstack((resized_color_image, depth_colormap))
-            else:
-                images = np.hstack((color_image, depth_colormap))
+#             depth_colormap_dim = depth_colormap.shape
+#             color_colormap_dim = color_image.shape
+# 
+#             # If depth and color resolutions are different, resize color image to match depth image for display
+#             if depth_colormap_dim != color_colormap_dim:
+#                 resized_color_image = cv2.resize(color_image, dsize=(depth_colormap_dim[1], depth_colormap_dim[0]), interpolation=cv2.INTER_AREA)
+#                 images = np.hstack((resized_color_image, depth_colormap))
+#             else:
+#                 images = np.hstack((color_image, depth_colormap))
                 
             image = tracker.handsFinder(color_image)
             lmList = tracker.positionFinder(image)
@@ -112,10 +114,20 @@ def main():
             # cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
             # cv2.imshow('RealSense', images)
             # cv2.waitKey(1)
-            if len(lmList) != 0:
-                print(lmList[4])
-
+            fullpos = []
+            for xy in lmList:
+                try:
+                    z = depth_frame.get_distance(xy[1], xy[2])
+                except:
+                    z = fullposold[xy[0]][2]
+                fullpos.append([xy[1], xy[2], z])
+            if len(fullpos) != 0:
+                print([depth_frame.get_width(), depth_frame.get_height()])
+                print(fullpos[4])
+                
+            fullposold = fullpos
             cv2.imshow("Video",image)
+            cv2.imshow("Depth",depth_colormap)
             cv2.waitKey(1)
 
     finally:
