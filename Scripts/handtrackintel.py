@@ -26,7 +26,7 @@ class handTracker():
                                         self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
 
-    def handsFinder(self,image,draw=True):
+    def handsFinder(self,image,draw=False):
         imageRGB = image #cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imageRGB)
 
@@ -37,7 +37,7 @@ class handTracker():
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
 
-    def positionFinder(self,image, handNo=0, draw=True):
+    def positionFinder(self,image, handNo=0, draw=False):
         lmlist = []
         if self.results.multi_hand_landmarks:
             Hand = self.results.multi_hand_landmarks[handNo]
@@ -97,6 +97,7 @@ def main():
             frames = pipeline.wait_for_frames()
             
             aligned_frames = align.process(frames)
+
             depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
             color_frame = aligned_frames.get_color_frame()
             
@@ -110,8 +111,7 @@ def main():
             # Convert images to numpy arrays
             depth_image = np.asanyarray(depth_frame.get_data())
             color_image = np.asanyarray(color_frame.get_data())
-            
-            dec_depth = decimation.process(depth_frame)
+#             dec_depth = decimation.process(depth_frame)
 #             dec_depth = np.asanyarray(dec_depth.get_data())
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
@@ -126,9 +126,12 @@ def main():
 # #                 images = np.hstack((resized_color_image, depth_colormap))
 #             else:
 #                 resized_color_image = color_image
-                
+#             start2 = time.time()    
             image = tracker.handsFinder(color_image)
             lmList = tracker.positionFinder(image)
+#             end2 = time.time()
+#             delta = end2 - start2
+#             print("np conversion took " + str(delta))
             # Show images
             # cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
             # cv2.imshow('RealSense', images)
@@ -150,8 +153,8 @@ def main():
                 print(fullpos[0])
                 fullposold = fullpos
 #                 cv2.circle(depth_colormap,(fullpos[0][0],fullpos[0][1]), 5 , (255,0,255), cv2.FILLED)
-            cv2.imshow("Video",image)
-            cv2.imshow("Depth",depth_colormap)
+#             cv2.imshow("Video",image)
+#             cv2.imshow("Depth",depth_colormap)
             #cv2.imshow("Dec Depth",dec_depth_colormap)
             end = time.time()
             delta = end - start
