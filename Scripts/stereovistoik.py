@@ -406,6 +406,7 @@ def main():
         pose.close()
         pose.unlink()
     try:
+        viz = False
         b = 48/1000  # baseline distance (m)
         # convention cap1-left cap2-right from perspective of cameras
         cap1 = 0  # device id for capture device 1
@@ -425,13 +426,21 @@ def main():
                            args=(lm3d_q, mtx, b))
         orthoframe = Process(
             target=find_orthonormal_frame, args=(pose, True))
-
-        v = Visualizer()
+        if viz:
+            v = Visualizer()
         capture1.start()
         capture2.start()
         lm_to_3d.start()
         orthoframe.start()
-        v.animation(0.1)
+        if viz:
+            v.animation(0.1)
+        else:
+            poseo = np.ndarray((4, 4), dtype=np.float64)
+            desiredpose = np.ndarray(
+                (4, 4), dtype=np.float64, buffer=pose.buf)
+            while True:
+                poseo += 0.05 * (desiredpose - poseo)
+                print(poseo)
     except Exception as e:
         print(e)
     finally:
