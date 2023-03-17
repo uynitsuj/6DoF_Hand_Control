@@ -11,6 +11,7 @@ import cv2
 import mediapipe as mp
 
 fulposold = []
+decimation = rs.decimation_filter()
 
 class handTracker():
     def __init__(self, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
@@ -52,6 +53,7 @@ class handTracker():
 def main():
     # Configure depth and color streams
     global fulposold
+    global decimation
     tracker = handTracker()
     pipeline = rs.pipeline()
     config = rs.config()
@@ -71,12 +73,12 @@ def main():
         print("The demo requires Depth camera with Color sensor")
         exit(0)
 
-    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+    config.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 30)
 
     if device_product_line == 'L500':
         config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
     else:
-        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+        config.enable_stream(rs.stream.color, 848, 480, rs.format.bgr8, 30)
 
     # Start streaming
     pipeline.start(config)
@@ -94,9 +96,12 @@ def main():
             # Convert images to numpy arrays
             depth_image = np.asanyarray(depth_frame.get_data())
             color_image = np.asanyarray(color_frame.get_data())
-
+            
+            dec_depth = decimation.process(depth_frame)
+#             dec_depth = np.asanyarray(dec_depth.get_data())
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+            #dec_depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(dec_depth, alpha=0.03), cv2.COLORMAP_JET)
 
 #             depth_colormap_dim = depth_colormap.shape
 #             color_colormap_dim = color_image.shape
@@ -115,6 +120,7 @@ def main():
             # cv2.imshow('RealSense', images)
             # cv2.waitKey(1)
             fullpos = []
+            #depth_frame = dec_depth
             for xy in lmList:
                 try:
                     z = depth_frame.get_distance(xy[1], xy[2])
@@ -128,6 +134,7 @@ def main():
             fullposold = fullpos
             cv2.imshow("Video",image)
             cv2.imshow("Depth",depth_colormap)
+            #cv2.imshow("Dec Depth",dec_depth_colormap)
             cv2.waitKey(1)
 
     finally:
