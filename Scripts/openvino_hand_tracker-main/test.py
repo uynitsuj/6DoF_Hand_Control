@@ -125,13 +125,16 @@ def main():
                 try:
                     z = depth_frame.get_distance(xy[1], xy[2])
                 except:
-                    z = fullposold[xy[0]][2]
+                    if len(fullposold) != 0:
+                        z = fullposold[xy[0]][2]
+                    else:
+                        z = 0
                 fullpos.append([xy[1], xy[2], z])
             if len(fullpos) != 0:
-                print([depth_frame.get_width(), depth_frame.get_height()])
-                print(fullpos[4])
+                #print([depth_frame.get_width(), depth_frame.get_height()])
+                print(fullpos[0])
+                fullposold = fullpos
                 
-            fullposold = fullpos
             cv2.imshow("Video",image)
             cv2.imshow("Depth",depth_colormap)
             #cv2.imshow("Dec Depth",dec_depth_colormap)
