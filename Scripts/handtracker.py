@@ -65,5 +65,5 @@ class handTracker():
         lm3dlist = []
         Hand = self.results.multi_hand_world_landmarks[handNo]
         for id, lm in enumerate(Hand.landmark):
-            lm3dlist.append([float(lm.z), float(lm.x), -float(lm.y)])
+            lm3dlist.append([float(lm.x), -float(lm.y), float(lm.z)])
         return lm3dlist
