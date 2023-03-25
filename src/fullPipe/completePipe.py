@@ -4,7 +4,7 @@ import numpy as np
 from IKEngine import IKSixR
 from SerialSend import serial_send
 import time as time
-import quaternion_to_se3 as qse
+import quatlinalg as qse
 
 testing = False
 conv = 180/np.pi
@@ -40,10 +40,10 @@ if not testing:
         #     pose = np.array(pose)
 #             print(pose)
 
-            robot = IKSixR(0, H06=(
-                pose[0][0], pose[0][1], pose[0][2], pose[0][3], pose[1][0], pose[1][1], pose[1][2], pose[1][3], pose[2][0], pose[2][1], pose[2][2], pose[2][3]))
-            robot.IK()
             try:
+                robot = IKSixR(0, H06=(
+                    pose[0][0], pose[0][1], pose[0][2], pose[0][3], pose[1][0], pose[1][1], pose[1][2], pose[1][3], pose[2][0], pose[2][1], pose[2][2], pose[2][3]))
+                robot.IK()
         #         # robot.draw_limbs(tbn=1)
         #         # robot.draw_limbs(tbn=2)
         #         # robot.draw_limbs(tbn=3)

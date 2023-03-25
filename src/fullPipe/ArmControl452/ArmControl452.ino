@@ -28,7 +28,7 @@ String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 String commandString = "";
 String i = "";
-bool check = true;
+bool check = false;
 
 void setup() {
   // put your setup code here, to run once:
