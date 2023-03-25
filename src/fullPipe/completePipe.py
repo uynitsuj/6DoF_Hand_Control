@@ -23,12 +23,12 @@ if not testing:
 
             try:
                 quataxyz = pickle.load(rfile)
-                quat = (quataxyz[0], quataxyz[1], quataxyz[2], quataxyz[3])
+                quat = (quataxyz[0][0], quataxyz[0][1], quataxyz[0][2], quataxyz[0][3])
                 quat = qse.normalize_quaternion(quat)
                 pose = qse.quaternion_to_se3(quat)
-                pose[0][3] = quataxyz[4]
-                pose[1][3] = quataxyz[5]
-                pose[2][3] = quataxyz[6]
+                pose[0][3] = quataxyz[0][4]
+                pose[1][3] = quataxyz[0][5]
+                pose[2][3] = quataxyz[0][6]
                 
 #                 pose = np.array(pose)*10
             except:  # Throws exception if incomplete or socket closed
@@ -38,28 +38,28 @@ if not testing:
         #     data = connection.recv(4096)
         #     pose = pickle.loads(data)
         #     pose = np.array(pose)
-            print(pose)
+#             print(pose)
 
             robot = IKSixR(0, H06=(
                 pose[0][0], pose[0][1], pose[0][2], pose[0][3], pose[1][0], pose[1][1], pose[1][2], pose[1][3], pose[2][0], pose[2][1], pose[2][2], pose[2][3]))
             robot.IK()
-#             try:
-#         #         # robot.draw_limbs(tbn=1)
-#         #         # robot.draw_limbs(tbn=2)
-#         #         # robot.draw_limbs(tbn=3)
-#         #         # robot.draw_limbs(tbn=4)
-#         #         # robot.draw_limbs(tbn=5)
-#         #         # robot.draw_limbs(tbn=6)
-#         #         # robot.draw_limbs(tbn=7)
-#         # #         robot.draw_limbs(tbn=8)
-#                 print(str(robot.rtnposeang(1, 1)*conv) + " "+str(robot.rtnposeang(2, 7)*conv)+" "+str(robot.rtnposeang(
-#                  3, 7)*conv)+" "+str(robot.rtnposeang(4, 7)*conv)+" "+str(robot.rtnposeang(5, 3)*conv)+" "+str(robot.rtnposeang(6, 3)*conv))
-# #                 serial_send(robot.rtnposeang(1, 1),robot.rtnposeang(2, 7),robot.rtnposeang(
-# #                     3, 7),robot.rtnposeang(4, 7),robot.rtnposeang(5, 3),robot.rtnposeang(6, 3))
-#         #         
-#         # 
-#             except IndexError:
-#                 print(" Out of config space")
+            try:
+        #         # robot.draw_limbs(tbn=1)
+        #         # robot.draw_limbs(tbn=2)
+        #         # robot.draw_limbs(tbn=3)
+        #         # robot.draw_limbs(tbn=4)
+        #         # robot.draw_limbs(tbn=5)
+        #         # robot.draw_limbs(tbn=6)
+        #         # robot.draw_limbs(tbn=7)
+        # #         robot.draw_limbs(tbn=8)
+#                 print(str(robot.rtnposeang(1, 1)*conv) + " "+str(robot.rtnposeang(2, 6)*conv)+" "+str(robot.rtnposeang(
+#                  3, 6)*conv)+" "+str(robot.rtnposeang(4, 6)*conv)+" "+str(robot.rtnposeang(5, 3)*conv)+" "+str(robot.rtnposeang(6, 3)*conv))
+                serial_send(robot.rtnposeang(1, 1),robot.rtnposeang(2, 6),robot.rtnposeang(
+                    3, 6),robot.rtnposeang(4, 6),robot.rtnposeang(5, 3),robot.rtnposeang(6, 3))
+        #         
+        # 
+            except IndexError:
+                print(" Out of config space")
 
             # print("theta1"+robot.rtnposeang(1, 7) + " "+robot.rtnposeang(2, 7)+" "+robot.rtnposeang(
             #    3, 7)+" "+robot.rtnposeang(4, 7)+" "+robot.rtnposeang(5, 7)+" "+robot.rtnposeang(6, 7))

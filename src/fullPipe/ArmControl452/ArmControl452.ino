@@ -39,6 +39,12 @@ void setup() {
   j4.attach(6);
   j5.attach(5);
   j6.attach(3);
+  j1.write(135*(2.0/3.0));
+  j2.write(100*(2.0/3.0));
+  j3.write(115*(2.0/3.0));
+  j4.write(90);
+  j5.write(90);
+  j6.write(90);
 
 }
 
@@ -55,7 +61,7 @@ void loop() {
     }
     if(commandString.equals("jtwo")){
       int big = int(2.0/3.0 * i.toInt());
-      j2.write(big);
+      if(big <= 180)j2.write(big);
       if(check)Serial.println(commandString+i);
     }
     if(commandString.equals("jthr")){

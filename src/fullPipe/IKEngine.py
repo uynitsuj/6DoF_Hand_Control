@@ -1,8 +1,8 @@
 
 from numpy import *
-from pyqtgraph.Qt import QtCore, QtWidgets
-import pyqtgraph.opengl as gl
-import pyqtgraph as pg
+# from pyqtgraph.Qt import QtCore, QtWidgets
+# import pyqtgraph.opengl as gl
+# import pyqtgraph as pg
 
 
 def transform_matrix2(ti, alpha_i_m1, a_i_m1, di):
@@ -22,7 +22,7 @@ class IKSixR:
         self.a2 = 150.114/1000
         self.a3 = 150.114/1000
         self.d4 = 3.556/1000
-        self.d5 = 83.82/1000
+        self.d5 = 25/1000
         self.d6 = 27.178/1000
         self.H06 = H06
 
