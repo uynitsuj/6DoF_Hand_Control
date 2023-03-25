@@ -21,7 +21,7 @@ serialcomm.timeout = 2
 def serial_send(j1, j2, j3, j4, j5, j6):
     print('sending')
 
-    jone = '#jone' + str(int(j1*conv)+180)
+    jone = '#jone' + str(int(j1*conv))
     serialcomm.write((jone + '\n').encode('ascii'))
 
     jtwo = '#jtwo' + str(int(j2 * conv)+180)

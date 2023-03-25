@@ -32,7 +32,7 @@ if not testing:
                 
 #                 pose = np.array(pose)*10
             except:  # Throws exception if incomplete or socket closed
-                print("Fuck")
+                print("Pipe End")
                 break
     #         print(pose)
         #     data = connection.recv(4096)
