@@ -11,7 +11,7 @@ import cv2
 import mediapipe as mp
 import time as time
 
-drawBool = False
+drawBool = True
 fullposold = []
 decimation = rs.decimation_filter()
 
@@ -151,10 +151,10 @@ def main():
                 fullpos.append([result[0], result[1], result[2]])
             if len(fullpos) != 0:
                 #print([depth_frame.get_width(), depth_frame.get_height()])
-                print(fullpos[0])
+                print(str(fullpos[5]) + " " + str(fullpos[9]) + " " + str(fullpos[13]) + " " + str(fullpos[17]))
                 fullposold = fullpos
 #                 cv2.circle(depth_colormap,(fullpos[0][0],fullpos[0][1]), 5 , (255,0,255), cv2.FILLED)
-#             cv2.imshow("Video",image)
+            cv2.imshow("Video",image)
 #             cv2.imshow("Depth",depth_colormap)
             #cv2.imshow("Dec Depth",dec_depth_colormap)
             end = time.time()

@@ -321,7 +321,7 @@ def stereo_process(outshm, mtx, b) -> None:
         buffer[:] = xyz[:]
 
 
-def updateHandTrack(capid: int, shm, shm3d, mtx, dist, newcameramtx, roi, imshow=False) -> None:
+def updateHandTrack(capid: int, shm, shm3d, mtx, dist, newcameramtx, roi, imshow=True) -> None:
     """
     Update loop for hand tracker pipeline.
     Intended to be used in a multiprocessing Process callback.
@@ -410,7 +410,7 @@ def main():
         b = 48/1000  # baseline distance (m)
         # convention cap1-left cap2-right from perspective of cameras
         cap1 = 0  # device id for capture device 1
-        cap2 = 1  # device id for capture device 2
+        cap2 = 2  # device id for capture device 2
         # lm3d_q = SimpleQueue()  # 3d projection of landmarks
 
         mtx, dist, rvecs, tvecs = cal.calibrate('./Calibrate/*.jpg')
