@@ -11,6 +11,7 @@ import cv2
 import mediapipe as mp
 import time as time
 
+drawBool = False
 fullposold = []
 decimation = rs.decimation_filter()
 
@@ -26,7 +27,7 @@ class handTracker():
                                         self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
 
-    def handsFinder(self,image,draw=False):
+    def handsFinder(self,image,draw=drawBool):
         imageRGB = image #cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imageRGB)
 
@@ -37,7 +38,7 @@ class handTracker():
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
 
-    def positionFinder(self,image, handNo=0, draw=False):
+    def positionFinder(self,image, handNo=0, draw=drawBool):
         lmlist = []
         if self.results.multi_hand_landmarks:
             Hand = self.results.multi_hand_landmarks[handNo]
@@ -76,18 +77,18 @@ def main():
         print("The demo requires Depth camera with Color sensor")
         exit(0)
 
-    config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+    config.enable_stream(rs.stream.depth, 424, 240, rs.format.z16, 30)
 
     if device_product_line == 'L500':
         config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
     else:
-        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+        config.enable_stream(rs.stream.color, 424, 240, rs.format.bgr8, 30)
 
     # Start streaming
     cfg = pipeline.start(config)
     profile = cfg.get_stream(rs.stream.depth) # Fetch stream profile for depth stream
     intr = profile.as_video_stream_profile().get_intrinsics()
-    align_to = rs.stream.depth
+    align_to = rs.stream.color
     align = rs.align(align_to)
     try:
         while True:
@@ -114,7 +115,7 @@ def main():
 #             dec_depth = decimation.process(depth_frame)
 #             dec_depth = np.asanyarray(dec_depth.get_data())
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
-            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+#             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
             #dec_depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(dec_depth, alpha=0.03), cv2.COLORMAP_JET)
 
 #             depth_colormap_dim = depth_colormap.shape
