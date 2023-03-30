@@ -42,9 +42,9 @@ void loop() {
     }
     int big = int(2.0/3.0 * angles[0]);
     j1.write(big);
-    int big2 = int(2.0/3.0 * angles[1]);
-    j2.write(big2);
-    j3.write(angles[2]);
+    j2.write(angles[1]);
+    int big2 = int(2.0/3.0 * angles[2]);
+    j3.write(big2);
     j4.write(angles[3]);
     j5.write(angles[4]);
     j6.write(angles[5]);

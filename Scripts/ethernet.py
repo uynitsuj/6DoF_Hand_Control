@@ -12,6 +12,5 @@ print("Waiting for connection")
 connection, add = sok.accept()
 while True:
     data = connection.recv(2048)
-    arrList = pickle.loads(data)
-    arr = np.array(arrList)
+    arr = pickle.loads(data)
     print(arr)

@@ -1,9 +1,6 @@
 import socket
 import pickle
 import numpy as np
-from multiprocessing import Process, SimpleQueue, shared_memory
-import Calibrate.cameracalibrate as cal
-import sys
 from IKEngine import IKSixR
 from SerialSend import serial_send
 
@@ -17,10 +14,9 @@ print("Waiting for connection")
 connection, add = sok.accept()
 while True:
     data = connection.recv(2048)
-    arrList = pickle.loads(data)
-    pose = np.array(arrList)
+    pose = pickle.loads(data)
 
-    robot = IKSixR(self.w, H06=(
+    robot = IKSixR(0, H06=(
         pose[0][0], pose[0][1], pose[0][2], pose[0][3], pose[1][0], pose[1][1], pose[1][2], pose[1][3], pose[2][0], pose[2][1], pose[2][2], pose[2][3]))
     robot.IK()
     try:
