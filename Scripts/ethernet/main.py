@@ -21,7 +21,6 @@ while True:
     arr[0, 1] = int(mes) * int(mes)
     arr[1, 0] = int(mes) * 4
     arr[1, 1] = int(mes) / 2
-    arrList = arr.tolist()
-    data_string = pickle.dumps(arrList)
+    data_string = pickle.dumps(arr)
     #message = arr.encode()
     sok.send(data_string)
