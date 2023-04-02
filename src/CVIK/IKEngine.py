@@ -16,7 +16,7 @@ def transform_matrix2(ti, alpha_i_m1, a_i_m1, di):
 
 class IKSixR:
 
-    def __init__(self, w, H06):
+    def __init__(self, w, H06):  # try adding joint angle init?
         self.w = w
         self.d1 = 72.39/1000
         self.a2 = 150.114/1000
@@ -85,7 +85,7 @@ class IKSixR:
                     -math.acos(
                         (self.H0_6[0][3] * sin(self.t1[0]) - self.H0_6[1][3] * cos(self.t1[0]) - self.d4) / self.d6))
             elif val > 1 > val - 0.005 and val > 0:
-                self.t5.append(math.acos(val))  # should these be val?
+                self.t5.append(math.acos(val))  # should these be val? was 1
                 self.t5.append(math.acos(val))
             elif val + 0.005 > -1 > val and val < 0:
                 self.t5.append(math.acos(-val))
