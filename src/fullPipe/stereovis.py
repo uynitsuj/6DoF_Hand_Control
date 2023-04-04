@@ -10,6 +10,7 @@ import sys
 import socket
 import pickle
 from IKEngine import IKSixR
+import copy
 
 
 class Visualizer(object):
@@ -168,11 +169,12 @@ class Visualizer(object):
         desiredpose = np.ndarray(
             (4, 4), dtype=np.float64, buffer=self.pose.buf)
         if self.pfilter:
+            print("filtered")
             pose += self.pfilter * (desiredpose - pose)
         else:
             pose = desiredpose
         if True:
-            # print(pose)
+            print(pose)
             width = 10
             w = [pose[0][3], pose[1][3], pose[2][3]]
             v1 = [pose[0][0], pose[1][0], pose[2][0]]
@@ -205,15 +207,14 @@ class Visualizer(object):
             # robot.draw_limbs(tbn=6)
             # robot.draw_limbs(tbn=7)
             robot.draw_limbs(tbn=8)
-            # print(str(robot.rtnposeang(1, 1)) + " "+str(robot.rtnposeang(2, 7))+" "+str(robot.rtnposeang(
-            #    3, 7))+" "+str(robot.rtnposeang(4, 7))+" "+str(robot.rtnposeang(5, 3))+" "+str(robot.rtnposeang(6, 3)))
+            print(str(robot.rtnposeang(1, 1)*57.29578+180) + " "+str(robot.rtnposeang(2, 7)*57.29578+360)+" "+str(robot.rtnposeang(
+                3, 7)*57.29578+180)+" "+str(robot.rtnposeang(4, 7)*57.29578+180)+" "+str(robot.rtnposeang(5, 3)*57.29578+180)+" "+str(robot.rtnposeang(6, 3)*57.29578+180))
 
         except IndexError:
             print(" Out of config space")
 
         # print("theta1"+robot.rtnposeang(1, 7) + " "+robot.rtnposeang(2, 7)+" "+robot.rtnposeang(
-        #    3, 7)+" "+robot.rtnposeang(4, 7)+" "+robot.rtnposeang(5, 7)+" "+robot.rtnposeang(6, 7))
-        '''
+        #    3, 7)+" "+robot.rtnposeang(4, 7)+" "+robot.rtnposeang(5, 7)+" "+robot.rtnposeang(6, 7))'''
 
     def animation(self, pfilter):
         self.pfilter = pfilter
@@ -227,7 +228,29 @@ class Visualizer(object):
         self.start()
 
 
-def find_orthonormal_frame(outshm, pfilter: bool, ethernet: bool, sok):
+def send(sok):
+    while True:
+        selfpose = shared_memory.SharedMemory(name='pose')
+        pose = np.ndarray((4, 4), dtype=np.float64)
+        desiredpose = np.ndarray(
+            (4, 4), dtype=np.float64, buffer=selfpose.buf)
+        # if self.pfilter:
+        #    print("filtered")
+        pose += 0.05 * (desiredpose - pose)
+        # else:
+        #    pose = copy.copy(desiredpose)
+        posecopy = pose
+        # print("Memory size of numpy array in bytes:",
+        #      pose.size * pose.itemsize)
+        posecopy = posecopy.tolist()
+        data_string = pickle.dumps(posecopy)
+        # message = arr.encode()
+        if pose[3][3]:
+            # print(pose[3][3])
+            sok.sendall(data_string)
+
+
+def find_orthonormal_frame(outshm, pfilter: bool):
     lm3dshm = shared_memory.SharedMemory(name='lm3d_q')
     lm3dil = shared_memory.SharedMemory(name='lm4_q')
     lm3dir = shared_memory.SharedMemory(name='lm5_q')
@@ -264,26 +287,44 @@ def find_orthonormal_frame(outshm, pfilter: bool, ethernet: bool, sok):
                 pinky = (lm3dlist[17] - lm3dlist[0])
                 v2 = pinky - \
                     np.dot((np.dot(v1.T, pinky)/np.dot(v1.T, v1)), v1)
-                v2 = v2/np.linalg.norm(v2)/10
+                try:
+                    v2 = v2/np.linalg.norm(v2)/10
+                except:
+                    print("Divide by zero probably lol")
 
                 pinkyl = (lm3dillist[17] - lm3dillist[0])
                 v2l = pinkyl - \
                     np.dot((np.dot(v1l.T, pinkyl)/np.dot(v1l.T, v1l)), v1l)
-                v2l = v2l/np.linalg.norm(v2l)/10
+                try:
+                    v2l = v2l/np.linalg.norm(v2l)/10
+                except:
+                    print("Divide by zero probably lol")
 
                 pinkyr = (lm3dirlist[17] - lm3dirlist[0])
                 v2r = pinkyr - \
                     np.dot((np.dot(v1r.T, pinkyr)/np.dot(v1r.T, v1r)), v1r)
-                v2r = v2r/np.linalg.norm(v2r)/10
+                try:
+                    v2r = v2r/np.linalg.norm(v2r)/10
+                except:
+                    print("Divide by zero probably lol")
 
                 v3 = np.cross(v1, v2)
-                v3 = v3/np.linalg.norm(v3)/10
+                try:
+                    v3 = v3/np.linalg.norm(v3)/10
+                except:
+                    print("Divide by zero probably lol")
 
                 v3l = np.cross(v1l, v2l)
-                v3l = v3l/np.linalg.norm(v3l)/10
+                try:
+                    v3l = v3l/np.linalg.norm(v3l)/10
+                except:
+                    print("Divide by zero probably lol")
 
                 v3r = np.cross(v1r, v2r)
-                v3r = v3r/np.linalg.norm(v3r)/10
+                try:
+                    v3r = v3r/np.linalg.norm(v3r)/10
+                except:
+                    print("Divide by zero probably lol")
 
                 pose1 = [[v1[0], v2[0], v3[0], wrist[0]], [
                     v1[1], v2[1], v3[1], wrist[1]], [v1[2], v2[2], v3[2], wrist[2]], [0, 0, 0, 1]]
@@ -302,10 +343,6 @@ def find_orthonormal_frame(outshm, pfilter: bool, ethernet: bool, sok):
                 buffer = np.ndarray(
                     pose.shape, dtype=np.float64, buffer=outshm.buf)
                 buffer[:] = pose[:]
-                if ethernet:
-                    data_string = pickle.dumps(pose)
-                    # message = arr.encode()
-                    sok.send(data_string)
 
 
 def stereo_process(outshm, mtx, b) -> None:
@@ -440,11 +477,16 @@ def main():
     try:
         ethernet = True
         viz = True
-        sok = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ip = "raspberrypi.local"
-        port = 5005
-        serverAddress = (ip, port)
-        sok.connect(serverAddress)
+
+        if ethernet:
+            sok = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            ip = "169.254.123.224"
+            port = 5005
+            serverAddress = (ip, port)
+            sok.connect(serverAddress)
+        else:
+            sok = 0
+
         b = 48/1000  # baseline distance (m)
         # convention cap1-left cap2-right from perspective of cameras
         cap1 = 0  # device id for capture device 1
@@ -463,13 +505,16 @@ def main():
         lm_to_3d = Process(target=stereo_process,
                            args=(lm3d_q, mtx, b))
         orthoframe = Process(
-            target=find_orthonormal_frame, args=(pose, True, ethernet, sok))
+            target=find_orthonormal_frame, args=(pose, True))
+        eth = Process(target=send, args=(sok,))
         if viz:
             v = Visualizer()
         capture1.start()
         capture2.start()
         lm_to_3d.start()
         orthoframe.start()
+        if ethernet:
+            eth.start()
         if viz:
             v.animation(0.1)
         else:
@@ -489,6 +534,7 @@ def main():
             capture2.join()
             lm_to_3d.join()
             orthoframe.join()
+            eth.join()
             lm1_q.close()
             lm1_q.unlink()
             lm2_q.close()
