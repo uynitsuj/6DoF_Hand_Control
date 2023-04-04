@@ -8,32 +8,57 @@ import math as m
 
 conv = 180/m.pi
 
-ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-ser.reset_input_buffer()
+# ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+# ser.reset_input_buffer()
+serialcomm = serial.Serial('/dev/ttyACM0', 115200, timeout = 0)
+serialcomm.bytesize = serial.EIGHTBITS
+serialcomm.parity = serial.PARITY_NONE
+serialcomm.stopbits = serial.STOPBITS_ONE
+serialcomm.timeout = 2
+# time.sleep(2)
 #ser.flush()
 
 def serial_send(j1, j2, j3, j4, j5, j6):
     print('sending')
-    arr = [j1, j2, j3, j4, j5, j6]
-    streng = ""
-    for i in range(6):
-        if i == 1:
-            j = str(int(arr[i]*conv) + 360)
-        else:
-            j = str(int(arr[i]*conv) + 180)
-        if 3 - len(j):
-            for i in range(3 - len(j)):
-                j = "0" + j
-        streng = streng + j
-    streng = streng + "\n"
-    
-#     streng = "<" + str(int(j1*conv)) + "," + str(int(j2*conv)) + "," + str(int(j3*conv)) + "," + str(int(j4*conv)) + "," + str(int(j5*conv)) + "," + str(int(j6*conv)) + ">\n"
-    print(streng)
-    start = time.time()
-    ser.write(streng.encode('ascii'))
-    end = time.time()
-    delta = end - start
-    print(delta)
+
+    jone = '#jone' + str(int(j1*conv))
+    serialcomm.write((jone + '\n').encode())
+
+    jtwo = '#jtwo' + str(int(j2 * conv))
+    serialcomm.write((jtwo + '\n').encode())
+
+    jthree = '#jthr' + str(int(j3 * conv))
+    serialcomm.write((jthree + '\n').encode())
+
+    jfour = '#jfou' + str(int(j4 * conv))
+    serialcomm.write((jfour + '\n').encode())
+
+    jfive = '#jfiv' + str(int(j5 * conv))
+    serialcomm.write((jfive + '\n').encode())
+
+    jsix = '#jsix' + str(int(j6 * conv))
+    serialcomm.write((jsix + '\n').encode())
+
+#     arr = [j1, j2, j3, j4, j5, j6]
+#     streng = ""
+#     for i in range(6):
+#         if i == 1:
+#             j = str(int(arr[i]*conv) + 360)
+#         else:
+#             j = str(int(arr[i]*conv) + 180)
+#         if 3 - len(j):
+#             for i in range(3 - len(j)):
+#                 j = "0" + j
+#         streng = streng + j
+#     streng = streng + "\n"
+#
+# #     streng = "<" + str(int(j1*conv)) + "," + str(int(j2*conv)) + "," + str(int(j3*conv)) + "," + str(int(j4*conv)) + "," + str(int(j5*conv)) + "," + str(int(j6*conv)) + ">\n"
+#     print(streng)
+#     start = time.time()
+#     ser.write(streng.encode('ascii'))
+#     end = time.time()
+#     delta = end - start
+#     print(delta)
     print('sent')
     
     #ser.close()
