@@ -28,6 +28,7 @@ String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 String commandString = "";
 String i = "";
+bool check = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -50,29 +51,29 @@ void loop() {
     if(commandString.equals("jone")){
       int big = int(2.0/3.0 * i.toInt());
       j1.write(big);
-    Serial.println(commandString+i);
+      if(check)Serial.println(commandString+i);
     }
     if(commandString.equals("jtwo")){
       j2.write(i.toInt());
-    Serial.println(commandString+i);
+      if(check)Serial.println(commandString+i);
     }
     if(commandString.equals("jthr")){
       int big2 = int(2.0/3.0 * i.toInt());
       j3.write(big2);
-    Serial.println(commandString+i);
+      if(check)Serial.println(commandString+i);
     }
     
     if(commandString.equals("jfou")){
       j4.write(i.toInt());
-    Serial.println(commandString+i);
+      if(check)Serial.println(commandString+i);
     }
     if(commandString.equals("jfiv")){
       j5.write(i.toInt());
-    Serial.println(commandString+i);
+      if(check)Serial.println(commandString+i);
     }
     if(commandString.equals("jsix")){
       j6.write(i.toInt());
-    Serial.println(commandString+i);
+      if(check)Serial.println(commandString+i);
     }
     inputString = "";
   }

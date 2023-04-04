@@ -5,7 +5,7 @@ from IKEngine import IKSixR
 from SerialSend import serial_send
 import time as time
 
-testing = True
+testing = False
 
 if not testing:
     sok = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
