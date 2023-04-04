@@ -22,22 +22,22 @@ def serial_send(j1, j2, j3, j4, j5, j6):
     print('sending')
 
     jone = '#jone' + str(int(j1*conv))
-    serialcomm.write((jone + '\n').encode())
+    serialcomm.write((jone + '\n').encode('ascii'))
 
     jtwo = '#jtwo' + str(int(j2 * conv))
-    serialcomm.write((jtwo + '\n').encode())
+    serialcomm.write((jtwo + '\n').encode('ascii'))
 
     jthree = '#jthr' + str(int(j3 * conv))
-    serialcomm.write((jthree + '\n').encode())
+    serialcomm.write((jthree + '\n').encode('ascii'))
 
     jfour = '#jfou' + str(int(j4 * conv))
-    serialcomm.write((jfour + '\n').encode())
+    serialcomm.write((jfour + '\n').encode('ascii'))
 
     jfive = '#jfiv' + str(int(j5 * conv))
-    serialcomm.write((jfive + '\n').encode())
+    serialcomm.write((jfive + '\n').encode('ascii'))
 
     jsix = '#jsix' + str(int(j6 * conv))
-    serialcomm.write((jsix + '\n').encode())
+    serialcomm.write((jsix + '\n').encode('ascii'))
 
 #     arr = [j1, j2, j3, j4, j5, j6]
 #     streng = ""

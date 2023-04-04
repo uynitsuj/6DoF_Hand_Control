@@ -38,7 +38,7 @@ void setup() {
   j4.attach(6);
   j5.attach(5);
   j6.attach(3);
-  
+
 }
 
 void loop() {
@@ -46,30 +46,36 @@ void loop() {
     stringComplete = false;
     getCommand();
     i = getStep();
-    Serial.println(i);
+//    Serial./println(i);
     if(commandString.equals("jone")){
       int big = int(2.0/3.0 * i.toInt());
       j1.write(big);
+    Serial.println(commandString+i);
     }
     if(commandString.equals("jtwo")){
       j2.write(i.toInt());
+    Serial.println(commandString+i);
     }
     if(commandString.equals("jthr")){
       int big2 = int(2.0/3.0 * i.toInt());
       j3.write(big2);
+    Serial.println(commandString+i);
     }
     
     if(commandString.equals("jfou")){
       j4.write(i.toInt());
+    Serial.println(commandString+i);
     }
     if(commandString.equals("jfiv")){
       j5.write(i.toInt());
+    Serial.println(commandString+i);
     }
     if(commandString.equals("jsix")){
       j6.write(i.toInt());
+    Serial.println(commandString+i);
     }
+    inputString = "";
   }
-  inputString = "";
   // put your main code here, to run repeatedly:
 //    angles[0] = getNum();
 //    angles[1] = getNum();
