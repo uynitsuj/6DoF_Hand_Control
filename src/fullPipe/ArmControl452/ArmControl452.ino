@@ -24,6 +24,11 @@ Servo j6;
 //  return(num.toInt());
 //}
 
+String inputString = "";         // a string to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
+String commandString = "";
+String i = "";
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
