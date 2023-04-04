@@ -21,22 +21,22 @@ serialcomm.timeout = 2
 def serial_send(j1, j2, j3, j4, j5, j6):
     print('sending')
 
-    jone = '#jone' + str(int(j1*conv))
+    jone = '#jone' + str(int(j1*conv)+180)
     serialcomm.write((jone + '\n').encode('ascii'))
 
-    jtwo = '#jtwo' + str(int(j2 * conv))
+    jtwo = '#jtwo' + str(int(j2 * conv)+360)
     serialcomm.write((jtwo + '\n').encode('ascii'))
 
-    jthree = '#jthr' + str(int(j3 * conv))
+    jthree = '#jthr' + str(int(j3 * conv)+180)
     serialcomm.write((jthree + '\n').encode('ascii'))
 
-    jfour = '#jfou' + str(int(j4 * conv))
+    jfour = '#jfou' + str(int(j4 * conv)+180)
     serialcomm.write((jfour + '\n').encode('ascii'))
 
-    jfive = '#jfiv' + str(int(j5 * conv))
+    jfive = '#jfiv' + str(int(j5 * conv)+180)
     serialcomm.write((jfive + '\n').encode('ascii'))
 
-    jsix = '#jsix' + str(int(j6 * conv))
+    jsix = '#jsix' + str(int(j6 * conv)+180)
     serialcomm.write((jsix + '\n').encode('ascii'))
 
 #     arr = [j1, j2, j3, j4, j5, j6]
