@@ -9,10 +9,24 @@ Servo j4;
 Servo j5;
 Servo j6; 
 
+int getNum(){
+  String num = "";
+  int i = 0;
+  while(Serial.available()){
+    char val = (char)Serial.read();
+    num = num + String(val);
+    i++;
+    if(i == 3){
+      Serial.print(num);
+      break;
+    }
+  }
+  return(num.toInt());
+}
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(115200);
   j1.attach(11);
   j2.attach(10);
   j3.attach(9);
@@ -24,30 +38,25 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-   if(Serial.available() > 0){
-    if(Serial.read() == '<'){
-      angles[0] = Serial.parseInt();
-      angles[1] = Serial.parseInt();
-      angles[2] = Serial.parseInt();
-      angles[3] = Serial.parseInt();
-      angles[4] = Serial.parseInt();
-      angles[5] = Serial.parseInt();
+    angles[0] = getNum();
+    angles[1] = getNum();
+    angles[2] = getNum();
+    angles[3] = getNum();
+    angles[4] = getNum();
+    angles[5] = getNum();
+    Serial.println();
+    if(Serial.available() > 0 && (char)Serial.read() == '\n'){
+      int big = int(2.0/3.0 * angles[0]);
+      j1.write(big);
+      j2.write(angles[1]);
+      int big2 = int(2.0/3.0 * angles[2]);
+      j3.write(big2);
+      j4.write(angles[3]);
+      j5.write(angles[4]);
+      j6.write(angles[5]);
     }
-    if(Serial.read() == '>'){
-      Serial.println("correct!");
-      for(int i = 0; i < 6; i++){
-        Serial.print(angles[i]);
-        Serial.print(", ");
-      }
+    else{
+      Serial.end();
+      Serial.begin(115200);
     }
-    int big = int(2.0/3.0 * angles[0]);
-    j1.write(big);
-    j2.write(angles[1]);
-    int big2 = int(2.0/3.0 * angles[2]);
-    j3.write(big2);
-    j4.write(angles[3]);
-    j5.write(angles[4]);
-    j6.write(angles[5]);
-  }
-  
 }

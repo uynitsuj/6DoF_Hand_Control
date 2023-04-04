@@ -8,14 +8,32 @@ import math as m
 
 conv = 180/m.pi
 
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
 ser.reset_input_buffer()
 #ser.flush()
 
 def serial_send(j1, j2, j3, j4, j5, j6):
     print('sending')
-    streng = "<" + str(j1*conv) + "," + str(j2*conv) + "," + str(j3*conv) + "," + str(j4*conv) + "," + str(j5*conv) + "," + str(j6*conv) + ">\n"
+    arr = [j1, j2, j3, j4, j5, j6]
+    streng = ""
+    for i in range(6):
+        if i == 1:
+            j = str(int(arr[i]*conv) + 360)
+        else:
+            j = str(int(arr[i]*conv) + 180)
+        if 3 - len(j):
+            for i in range(3 - len(j)):
+                j = "0" + j
+        streng = streng + j
+    streng = streng + "\n"
+    
+#     streng = "<" + str(int(j1*conv)) + "," + str(int(j2*conv)) + "," + str(int(j3*conv)) + "," + str(int(j4*conv)) + "," + str(int(j5*conv)) + "," + str(int(j6*conv)) + ">\n"
+    print(streng)
+    start = time.time()
     ser.write(streng.encode('ascii'))
+    end = time.time()
+    delta = end - start
+    print(delta)
     print('sent')
     
     #ser.close()

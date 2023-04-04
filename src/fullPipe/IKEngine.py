@@ -332,8 +332,8 @@ class IKSixR:
         # x_data = [vector[0] for vector in limb_vectors]
         # y_data = [vector[1] for vector in limb_vectors]
         # z_data = [vector[2] for vector in limb_vectors]
-        self.w.addItem(gl.GLLinePlotItem(
-            pos=limb_vectors, color=pg.glColor((3, 50)), width=5, antialias=True))
+#         self.w.addItem(gl.GLLinePlotItem(
+#             pos=limb_vectors, color=pg.glColor((3, 50)), width=5, antialias=True))
 
     def rtnposeang(self, j, i):
         if j == 1:
