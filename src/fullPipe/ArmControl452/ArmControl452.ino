@@ -28,7 +28,7 @@ String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 String commandString = "";
 String i = "";
-bool check = false;
+bool check = true;
 
 void setup() {
   // put your setup code here, to run once:
@@ -54,12 +54,13 @@ void loop() {
       if(check)Serial.println(commandString+i);
     }
     if(commandString.equals("jtwo")){
-      j2.write(i.toInt());
+      int big = int(2.0/3.0 * i.toInt());
+      j2.write(big);
       if(check)Serial.println(commandString+i);
     }
     if(commandString.equals("jthr")){
-      int big2 = int(2.0/3.0 * i.toInt());
-      j3.write(big2);
+      int big = int(2.0/3.0 * i.toInt());
+      j3.write(big);
       if(check)Serial.println(commandString+i);
     }
     
