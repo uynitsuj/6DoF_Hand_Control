@@ -9,7 +9,7 @@ import pyqtgraph as pg
 import sys
 import socket
 import pickle
-from IKEngine import IKSixR
+from IKEngineviz import IKSixR
 import time
 # import copy
 
@@ -260,7 +260,7 @@ class Visualizer(object):
         self.pose = shared_memory.SharedMemory(name='pose')
         timer = QtCore.QTimer()
         timer.timeout.connect(self.update)
-        timer.start(40)
+        timer.start(50)
         self.start()
 
 
