@@ -103,25 +103,25 @@ class Visualizer(object):
         desiredpose = np.ndarray(
             (1, 7), dtype=np.float64, buffer=self.pose.buf)
         if self.pfilter:
-            # print("filtered")
+
             quatdisp += self.pfilter * (desiredpose - quatdisp)
         else:
             quatdisp = desiredpose
-        # print(quatdisp)
+
         if quatdisp[0][0]:
             pose = quaternion_to_se3(normalize_quaternion(
                 (quatdisp[0][0], quatdisp[0][1], quatdisp[0][2], quatdisp[0][3])))
             pose[0][3] = quatdisp[0][4]
             pose[1][3] = quatdisp[0][5]
             pose[2][3] = quatdisp[0][6]
-            # print(pose)
+
             width = 10
             w = [pose[0][3], pose[1][3], pose[2][3]]
             v1 = [pose[0][0]/10, pose[1][0]/10, pose[2][0]/10]
             v2 = [pose[0][1]/10, pose[1][1]/10, pose[2][1]/10]
             v3 = [pose[0][2]/10, pose[1][2]/10, pose[2][2]/10]
             v1 = np.append([w], [np.add(w, v1)], axis=0)
-            # print(v1)
+
             v2 = np.append([w], [np.add(w, v2)], axis=0)
 
             v3 = np.append([w], [np.add(w, v3)], axis=0)
@@ -174,7 +174,7 @@ def send(sok):
 
     This function reads a desired pose from shared memory, calculates an updated pose using an
     proportional filter, and sends the updated pose to the connected client as a
-    pickled numpy array. The function sends the data every 60 milliseconds.
+    pickled numpy array.
 
     Args:
         sok (socket.socket): The socket object used to send the pickled pose data to the connected client.
@@ -183,7 +183,7 @@ def send(sok):
         None
     """
     while True:
-        time.sleep(60/1000)  # delay between data send in seconds
+        time.sleep(60/1000)  # Function sends the data every 60 ms
         selfpose = shared_memory.SharedMemory(name='pose')
         pose = np.ndarray((1, 7), dtype=np.float64)
         desiredpose = np.ndarray(
@@ -197,7 +197,7 @@ def send(sok):
 
 def find_orthonormal_frame(outshm, pfilter: bool):
     """
-    Finds an orthonormal frame for a hand pose and writes the result as a quaternion and wrist position to shared memory.
+    Brief: Finds an orthonormal frame for a hand pose and writes the result as a quaternion and wrist position to shared memory.
 
     This function calculates the orthonormal frame for the hand pose using data from shared memory. It can apply a proportional filter if pfilter is True.
     The orthonormal frame is calculated using the positions of the index finger and pinky, and the resulting rotation matrix is converted to a quaternion.
@@ -312,7 +312,7 @@ def find_orthonormal_frame(outshm, pfilter: bool):
 
 def stereo_process(outshm, mtx, b) -> None:
     """
-    Processes stereo image data to compute 3D positions of hand landmarks using stereoscopic projection.
+    Brief: Processes stereo image data to compute 3D positions of hand landmarks using stereoscopic projection.
 
     This function takes shared memory objects containing 2D landmark lists for two camera devices, and computes the 3D positions of the hand landmarks
     using stereoscopic projection. The stereo camera center is considered the origin frame. The resulting list of 3D vectors is written to the shared
@@ -370,7 +370,7 @@ def stereo_process(outshm, mtx, b) -> None:
 
 def updateHandTrack(capid: int, shm, shm3d, mtx, dist, newcameramtx, roi, imshow=False) -> None:
     """
-    Main update loop for the hand tracking pipeline.
+    Brief: Main update loop for the hand tracking pipeline.
 
     This function is intended to be used in a multiprocessing Process callback. It captures frames from the specified camera, processes the frames
     to find hand landmarks using the handtracker class, and writes the 2D and 3D hand landmark positions to the provided shared memory objects.
@@ -382,13 +382,13 @@ def updateHandTrack(capid: int, shm, shm3d, mtx, dist, newcameramtx, roi, imshow
 
     shm3d (shared_memory.SharedMemory): A shared memory object used to write the 3D hand landmark positions.
 
-    mtx (numpy.ndarray): A 3x3 camera intrinsic matrix.
+    mtx (numpy.ndarray): A 3x3 camera intrinsic matrix. (unused)
 
-    dist (numpy.ndarray): The distortion coefficients of the camera.
+    dist (numpy.ndarray): The distortion coefficients of the camera. (unused)
 
-    newcameramtx (numpy.ndarray): A new camera matrix obtained after undistorting the image.
+    newcameramtx (numpy.ndarray): A new camera matrix obtained after undistorting the image. (unused)
 
-    roi (tuple): A tuple containing the region of interest (x, y, w, h) after undistorting the image.
+    roi (tuple): A tuple containing the region of interest (x, y, w, h) after undistorting the image. (unused)
 
     imshow (bool, optional): If True, the processed frame with hand landmarks will be displayed using cv2.imshow(). Defaults to False.
 
@@ -473,7 +473,7 @@ def main():
 
         if ethernet:
             sok = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            ip = "169.254.96.16"
+            ip = "169.254.96.16"  # remote device IP
             port = 5005
             serverAddress = (ip, port)
             sok.connect(serverAddress)
@@ -481,7 +481,7 @@ def main():
             sok = 0
 
         b = 48/1000  # baseline distance (m)
-        # convention cap1-left cap2-right from perspective of cameras
+        # convention: cap1-left cap2-right from perspective behind cameras
         cap1 = 0  # device id for capture device 1
         cap2 = 1  # device id for capture device 2
 
@@ -509,13 +509,6 @@ def main():
             eth.start()
         if viz:
             v.animation(0.1)
-        else:
-            poseo = np.ndarray((4, 4), dtype=np.float64)
-            desiredpose = np.ndarray(
-                (4, 4), dtype=np.float64, buffer=pose.buf)
-            while True:
-                poseo += 0.05 * (desiredpose - poseo)
-                print(poseo)
     except Exception as e:
         print(e)
     finally:
