@@ -10,35 +10,9 @@ import sys
 import socket
 import pickle
 from IKEngineviz import IKSixR
+from quatlinalg import normalize_quaternion, quaternion_to_se3, orthonormalize_matrix, so3_to_quaternion
 import time
 # import copy
-
-
-def normalize_quaternion(quat):
-    norm = np.linalg.norm(quat)
-    return tuple(q / norm for q in quat)
-
-
-def quaternion_to_se3(quat):
-    w, x, y, z = quat
-    Nq = w*w + x*x + y*y + z*z
-    if Nq < np.finfo(float).eps:
-        raise ValueError("Input quaternion has zero length.")
-
-    s = 2.0 / Nq
-    xs, ys, zs = x * s, y * s, z * s
-    wx, wy, wz = w * xs, w * ys, w * zs
-    xx, xy, xz = x * xs, x * ys, x * zs
-    yy, yz, zz = y * ys, y * zs, z * zs
-
-    se3 = np.array([
-        [1.0 - (yy + zz), xy - wz, xz + wy, 0],
-        [xy + wz, 1.0 - (xx + zz), yz - wx, 0],
-        [xz - wy, yz + wx, 1.0 - (xx + yy), 0],
-        [0, 0, 0, 1]
-    ])
-
-    return se3
 
 
 class Visualizer(object):
@@ -124,73 +98,6 @@ class Visualizer(object):
 
                 self.w.addItem(gl.GLScatterPlotItem(
                     pos=lm3dlist, color=pg.glColor((2, 50)), size=28))
-            '''
-            lm3dlist = np.ndarray((21, 3), dtype=np.float64,
-                                  buffer=self.lm3dil.buf)
-
-            if lm3dlist.tolist():
-
-                # print(lm3dlist)
-                width = 30
-
-                # Thumb
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[0:5], color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Index
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=np.append([lm3dlist[0]], lm3dlist[5:9], axis=0), color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Middle
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[9:13], color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Ring
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[13:17], color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Pinky
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=np.append([lm3dlist[0]],
-                                  lm3dlist[17:21], axis=0), color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Knuckle
-                knuckle = np.append([lm3dlist[5]], [lm3dlist[9]], axis=0)
-                knuckle = np.append(knuckle, [lm3dlist[13]], axis=0)
-                knuckle = np.append(knuckle, [lm3dlist[17]], axis=0)
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=knuckle, color=pg.glColor((4, 100)), width=width, antialias=True))
-
-                self.w.addItem(gl.GLScatterPlotItem(
-                    pos=lm3dlist, color=pg.glColor((30, 50)), size=28))
-
-            lm3dlist = np.ndarray((21, 3), dtype=np.float64,
-                                  buffer=self.lm3dir.buf)
-            if lm3dlist.tolist():
-
-                # print(lm3dlist)
-                width = 30
-
-                # Thumb
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[0:5], color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Index
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=np.append([lm3dlist[0]], lm3dlist[5:9], axis=0), color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Middle
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[9:13], color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Ring
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[13:17], color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Pinky
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=np.append([lm3dlist[0]],
-                                  lm3dlist[17:21], axis=0), color=pg.glColor((4, 100)), width=width, antialias=True))
-                # Knuckle
-                knuckle = np.append([lm3dlist[5]], [lm3dlist[9]], axis=0)
-                knuckle = np.append(knuckle, [lm3dlist[13]], axis=0)
-                knuckle = np.append(knuckle, [lm3dlist[17]], axis=0)
-                self.w.addItem(gl.GLLinePlotItem(
-                    pos=knuckle, color=pg.glColor((4, 100)), width=width, antialias=True))
-
-                self.w.addItem(gl.GLScatterPlotItem(
-                    pos=lm3dlist, color=pg.glColor((30, 50)), size=28))'''
 
         quatdisp = np.ndarray((1, 7), dtype=np.float64)
         desiredpose = np.ndarray(
@@ -249,9 +156,6 @@ class Visualizer(object):
             # except IndexError:
             #    print(" Out of config space")
 
-            # print("theta1"+robot.rtnposeang(1, 7) + " "+robot.rtnposeang(2, 7)+" "+robot.rtnposeang(
-            #    3, 7)+" "+robot.rtnposeang(4, 7)+" "+robot.rtnposeang(5, 7)+" "+robot.rtnposeang(6, 7))'''
-
     def animation(self, pfilter):
         self.pfilter = pfilter
         self.lm3d = shared_memory.SharedMemory(name='lm3d_q')
@@ -264,76 +168,48 @@ class Visualizer(object):
         self.start()
 
 
-def so3_to_quaternion(R):
-    """
-    Convert a rotation matrix R in SO(3) to a quaternion.
-    """
-    tr = np.trace(R)
-    if tr > 0:
-        S = np.sqrt(tr + 1.0) * 2  # S=4*qw
-        qw = 0.25 * S
-        qx = (R[2, 1] - R[1, 2]) / S
-        qy = (R[0, 2] - R[2, 0]) / S
-        qz = (R[1, 0] - R[0, 1]) / S
-    elif (R[0, 0] > R[1, 1]) and (R[0, 0] > R[2, 2]):
-        S = np.sqrt(1.0 + R[0, 0] - R[1, 1] - R[2, 2]) * 2  # S=4*qx
-        qw = (R[2, 1] - R[1, 2]) / S
-        qx = 0.25 * S
-        qy = (R[0, 1] + R[1, 0]) / S
-        qz = (R[0, 2] + R[2, 0]) / S
-    elif R[1, 1] > R[2, 2]:
-        S = np.sqrt(1.0 + R[1, 1] - R[0, 0] - R[2, 2]) * 2  # S=4*qy
-        qw = (R[0, 2] - R[2, 0]) / S
-        qx = (R[0, 1] + R[1, 0]) / S
-        qy = 0.25 * S
-        qz = (R[1, 2] + R[2, 1]) / S
-    else:
-        S = np.sqrt(1.0 + R[2, 2] - R[0, 0] - R[1, 1]) * 2  # S=4*qz
-        qw = (R[1, 0] - R[0, 1]) / S
-        qx = (R[0, 2] + R[2, 0]) / S
-        qy = (R[1, 2] + R[2, 1]) / S
-        qz = 0.25 * S
-    return np.array([qw, qx, qy, qz])
-
-
-def orthonormalize_matrix(M):
-    u1 = M[:, 0]
-    u2 = M[:, 1] - np.dot(M[:, 1], u1) * u1
-    u3 = M[:, 2] - np.dot(M[:, 2], u1) * u1 - np.dot(M[:, 2], u2) * u2
-
-    u1 /= np.linalg.norm(u1)
-    u2 /= np.linalg.norm(u2)
-    u3 /= np.linalg.norm(u3)
-
-    return np.column_stack((u1, u2, u3))
-
-
 def send(sok):
+    """
+    Brief: Continuously sends the updated pose to a connected client via a socket connection.
+
+    This function reads a desired pose from shared memory, calculates an updated pose using an
+    proportional filter, and sends the updated pose to the connected client as a
+    pickled numpy array. The function sends the data every 60 milliseconds.
+
+    Args:
+        sok (socket.socket): The socket object used to send the pickled pose data to the connected client.
+
+    Returns:
+        None
+    """
     while True:
-        time.sleep(60/1000)
+        time.sleep(60/1000)  # delay between data send in seconds
         selfpose = shared_memory.SharedMemory(name='pose')
         pose = np.ndarray((1, 7), dtype=np.float64)
         desiredpose = np.ndarray(
             (1, 7), dtype=np.float64, buffer=selfpose.buf)
-        # if self.pfilter:
-        #    print("filtered")
-        pose += 0.08 * (desiredpose - pose)
-        # else:
-        #    pose = copy.copy(desiredpose)
+        pose += 0.08 * (desiredpose - pose)  # moving average filter impl
         posecopy = pose
-        # print("Memory size of numpy array in bytes:",
-        #      pose.size * pose.itemsize)
-        # posecopy = posecopy.tolist()
         data_string = pickle.dumps(posecopy)
-        # message = arr.encode()
-        # print("posecopy")
-        # print(posecopy)
         if pose[0][0]:
-            # print(pose[3][3])
             sok.sendall(data_string)
 
 
 def find_orthonormal_frame(outshm, pfilter: bool):
+    """
+    Finds an orthonormal frame for a hand pose and writes the result as a quaternion and wrist position to shared memory.
+
+    This function calculates the orthonormal frame for the hand pose using data from shared memory. It can apply a proportional filter if pfilter is True.
+    The orthonormal frame is calculated using the positions of the index finger and pinky, and the resulting rotation matrix is converted to a quaternion.
+    The calculated quaternion and wrist position are written to the shared memory specified by outshm.
+
+    Args:
+    outshm (shared_memory.SharedMemory): A shared memory object used to write the output quaternion and wrist position.
+    pfilter (bool): If True, apply a proportional filter to the input data. If False, use the input data directly.
+
+    Returns:
+    None
+    """
     lm3dshm = shared_memory.SharedMemory(name='lm3d_q')
     lm3dil = shared_memory.SharedMemory(name='lm4_q')
     lm3dir = shared_memory.SharedMemory(name='lm5_q')
@@ -436,13 +312,26 @@ def find_orthonormal_frame(outshm, pfilter: bool):
 
 def stereo_process(outshm, mtx, b) -> None:
     """
-    Takes two landmark list queue objects and comput_manyes the stereoscopic projection.
-    Intended to be used in a multiprocessing Process callback.
-    Result is a list of vectors with translation position. Stereo camera center is the origin frame.
-    :param queue1: landmark list for camera device 1
-    :param queue2: landmark list for camera device 2
-    :param queueout: stereoscopic projection, a list of 3-vectors
+    Processes stereo image data to compute 3D positions of hand landmarks using stereoscopic projection.
+
+    This function takes shared memory objects containing 2D landmark lists for two camera devices, and computes the 3D positions of the hand landmarks
+    using stereoscopic projection. The stereo camera center is considered the origin frame. The resulting list of 3D vectors is written to the shared
+    memory specified by outshm. This function is intended to be used in a multiprocessing Process callback.
+
+    Args:
+    outshm (shared_memory.SharedMemory): A shared memory object used to write the output 3D positions of hand landmarks.
+
+    mtx (numpy.ndarray): A 3x3 camera intrinsic matrix containing focal lengths (fx, fy) and optical center (ox, oy).
+
+    b (float): The baseline distance between the two cameras.
+
+    Returns:
+    None
+
+    GPT-4 Response: The stereoscopic projection algorithm seems correct. It calculates the disparity (d) between the corresponding landmarks from both cameras,
+    and then uses the disparity, camera intrinsic matrix (mtx), and baseline distance (b) to compute the 3D positions (x, y, z) of the hand landmarks.
     """
+
     fx = mtx[0][0]
     fy = mtx[1][1]
     ox = mtx[0][2]
@@ -481,15 +370,34 @@ def stereo_process(outshm, mtx, b) -> None:
 
 def updateHandTrack(capid: int, shm, shm3d, mtx, dist, newcameramtx, roi, imshow=False) -> None:
     """
-    Update loop for hand tracker pipeline.
-    Intended to be used in a multiprocessing Process callback.
-    :param capid: capture device ID as a valid parameter to cv2.VideoCapture()
-    :param queue: multiprocessing Queue() object. Queue is updated with hand landmark list
+    Main update loop for the hand tracking pipeline.
+
+    This function is intended to be used in a multiprocessing Process callback. It captures frames from the specified camera, processes the frames
+    to find hand landmarks using the handtracker class, and writes the 2D and 3D hand landmark positions to the provided shared memory objects.
+
+    Args:
+    capid (int): The capture device ID, which is a valid parameter for cv2.VideoCapture().
+
+    shm (shared_memory.SharedMemory): A shared memory object used to write the 2D hand landmark positions.
+
+    shm3d (shared_memory.SharedMemory): A shared memory object used to write the 3D hand landmark positions.
+
+    mtx (numpy.ndarray): A 3x3 camera intrinsic matrix.
+
+    dist (numpy.ndarray): The distortion coefficients of the camera.
+
+    newcameramtx (numpy.ndarray): A new camera matrix obtained after undistorting the image.
+
+    roi (tuple): A tuple containing the region of interest (x, y, w, h) after undistorting the image.
+
+    imshow (bool, optional): If True, the processed frame with hand landmarks will be displayed using cv2.imshow(). Defaults to False.
+
+    Returns:
+    None
     """
     tracker = handtracker.handTracker()
     cap = cv2.VideoCapture(capid)
 
-    # cap.set(cv2.CAP_PROP_FPS, 15)
     while True:
         _, dst = cap.read()
 
@@ -502,10 +410,6 @@ def updateHandTrack(capid: int, shm, shm3d, mtx, dist, newcameramtx, roi, imshow
         lmList = np.array(lmList)
         lm3dlist = tracker.find3D()
         lm3dlist = np.array(lm3dlist).reshape(21, 3)
-
-        # print(np.array(lm3dlist).shape)
-        # print(np.array(lm3dlist).dtype)
-        # print(np.array(lm3dlist).nbytes)
 
         buffer = np.ndarray(lmList.shape, dtype=np.int32, buffer=shm.buf)
         buffer[:] = lmList[:]
@@ -580,7 +484,6 @@ def main():
         # convention cap1-left cap2-right from perspective of cameras
         cap1 = 0  # device id for capture device 1
         cap2 = 1  # device id for capture device 2
-        # lm3d_q = SimpleQueue()  # 3d projection of landmarks
 
         mtx, dist, rvecs, tvecs = cal.calibrate('./Calibrate/*.jpg')
         w = 1280
