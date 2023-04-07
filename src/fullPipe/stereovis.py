@@ -317,7 +317,7 @@ def send(sok):
             (1, 7), dtype=np.float64, buffer=selfpose.buf)
         # if self.pfilter:
         #    print("filtered")
-        pose += 0.05 * (desiredpose - pose)
+        pose += 0.08 * (desiredpose - pose)
         # else:
         #    pose = copy.copy(desiredpose)
         posecopy = pose
