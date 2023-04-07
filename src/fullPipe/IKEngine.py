@@ -1,15 +1,8 @@
 
 from numpy import *
-<<<<<<< HEAD
 # from pyqtgraph.Qt import QtCore, QtWidgets
 # import pyqtgraph.opengl as gl
 # import pyqtgraph as pg
-=======
-from pyqtgraph.Qt import QtCore, QtWidgets
-import pyqtgraph.opengl as gl
-import pyqtgraph as pg
-import math
->>>>>>> 04e7a52774946c5afb973606c82d796dc58f97c3
 
 
 def transform_matrix2(ti, alpha_i_m1, a_i_m1, di):
