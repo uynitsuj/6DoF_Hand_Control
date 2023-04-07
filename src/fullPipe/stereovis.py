@@ -1,5 +1,5 @@
 import cv2
-from multiprocessing import Process, SimpleQueue, shared_memory
+from multiprocessing import Process, shared_memory
 import handtracker
 import Calibrate.cameracalibrate as cal
 import numpy as np
@@ -12,7 +12,6 @@ import pickle
 from IKEngineviz import IKSixR
 from quatlinalg import normalize_quaternion, quaternion_to_se3, orthonormalize_matrix, so3_to_quaternion
 import time
-# import copy
 
 
 class Visualizer(object):
