@@ -112,6 +112,7 @@ class Visualizer(object):
             pose[0][3] = quatdisp[0][4]
             pose[1][3] = quatdisp[0][5]
             pose[2][3] = quatdisp[0][6]
+            print(pose)
 
             width = 10
             w = [pose[0][3], pose[1][3], pose[2][3]]
@@ -184,7 +185,7 @@ def send(sok):
         pose = np.ndarray((1, 7), dtype=np.float64)
         desiredpose = np.ndarray(
             (1, 7), dtype=np.float64, buffer=selfpose.buf)
-        pose += 0.08 * (desiredpose - pose)  # moving average filter impl
+        pose += 0.09 * (desiredpose - pose)  # moving average filter impl
         posecopy = pose
         data_string = pickle.dumps(posecopy)
         if pose[0][0]:

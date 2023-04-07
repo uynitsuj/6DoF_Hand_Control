@@ -49,175 +49,175 @@ class IKSixR:
 
     # Inverse Kinematics method
     def IK(self):
-        # try:
+        try:
 
-        Md6 = [[0],
-               [0],
-               [-self.d6],
-               [1]]
-        P0_5 = dot(self.H0_6, Md6)
-
-        R = (sqrt(square(P0_5[1][0]) + square(P0_5[0][0])))
-
-        val = math.atan2(P0_5[1][0], P0_5[0][0]) + \
-            math.acos(self.d4 / R) + pi / 2
-        # Angles get added to list
-        if -0.005 < val < 0.005:
-            self.t1.append(0)
-        else:
-            self.t1.append(val)
-
-        val = math.atan2(P0_5[1][0], P0_5[0][0]) - \
-            math.acos(self.d4 / R) + pi / 2
-        if -0.005 < val < 0.005:
-            self.t1.append(0)
-        else:
-            self.t1.append(val)
-
-        val = (self.H0_6[0][3] * sin(self.t1[0]) - self.H0_6[1]
-               [3] * cos(self.t1[0]) - self.d4) / self.d6
-
-        if 1 > val > -1:
-            self.t5.append(
-                math.acos(
-                    (self.H0_6[0][3] * sin(self.t1[0]) - self.H0_6[1][3] * cos(self.t1[0]) - self.d4) / self.d6))
-            self.t5.append(
-                -math.acos(
-                    (self.H0_6[0][3] * sin(self.t1[0]) - self.H0_6[1][3] * cos(self.t1[0]) - self.d4) / self.d6))
-        elif val > 1 > val - 0.005 and val > 0:
-            self.t5.append(math.acos(val))  # should these be val?
-            self.t5.append(math.acos(val))
-        elif val + 0.005 > -1 > val and val < 0:
-            self.t5.append(math.acos(-val))
-            self.t5.append(math.acos(-val))
-
-        val = (self.H0_6[0][3] * sin(self.t1[1]) - self.H0_6[1]
-               [3] * cos(self.t1[1]) - self.d4) / self.d6
-        if 1 > val > -1:
-            self.t5.append(
-                math.acos(
-                    (self.H0_6[0][3] * sin(self.t1[1]) - self.H0_6[1][3] * cos(self.t1[1]) - self.d4) / self.d6))
-            self.t5.append(
-                -math.acos(
-                    (self.H0_6[0][3] * sin(self.t1[1]) - self.H0_6[1][3] * cos(self.t1[1]) - self.d4) / self.d6))
-        elif val > 1 > val - 0.005 and val > 0:
-            self.t5.append(math.acos(val))
-            self.t5.append(math.acos(val))
-        elif val + 0.005 > -1 > val and val < 0:
-            self.t5.append(math.acos(-val))
-            self.t5.append(math.acos(-val))
-
-        for g in range(2):
-            H0_1 = transform_matrix2(
-                self.t1[0], self.PT[0][1], self.PT[0][2], self.PT[0][3])
-            H4_5 = transform_matrix2(
-                self.t5[g], self.PT[4][1], self.PT[4][2], self.PT[4][3])
-            Md4 = [[0],
+            Md6 = [[0],
                    [0],
-                   [0],
+                   [-self.d6],
                    [1]]
-            invH0_6 = linalg.inv(self.H0_6)
-            Tt1 = [[cos(self.t1[0]), sin(self.t1[0]), 0, 0],
-                   [-sin(self.t1[0]), cos(self.t1[0]), 0, 0],
-                   [0, 0, 1, -self.d1]]
-            if sin(self.t5[g]) == 0:
-                self.t6.append(0)
-            elif sin(self.t5[g]) != 0:
-                self.t6.append(math.atan2(
-                    ((-(invH0_6[1][0] * sin(self.t1[0])) + (invH0_6[1]
-                     [1] * cos(self.t1[0]))) / sin(self.t5[g])),
-                    (((invH0_6[0][0] * sin(self.t1[0])) - (invH0_6[0][1] * cos(self.t1[0]))) / sin(self.t5[g]))))
-            H5_6 = transform_matrix2(
-                self.t6[g], self.PT[5][1], self.PT[5][2], self.PT[5][3])
-            P0_4 = dot(dot(self.H0_6, linalg.inv(dot(H4_5, H5_6))), Md4)
-            P1_4 = dot(Tt1, P0_4)
-            P1_4xzSQR = float(square(P1_4[0][0]) + square(P1_4[2][0]))
-            if -1 <= ((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3)) <= 1:
-                self.t3.append(
-                    math.acos(((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3))))
-                self.t2.append(math.atan2(-P1_4[2][0], -P1_4[0][0]) - math.asin(
-                    -self.a3 * sin(self.t3[len(self.t2)]) / sqrt(P1_4xzSQR)))
-                H1_2 = transform_matrix2(
-                    self.t2[len(self.t2) - 1], self.PT[1][1], self.PT[1][2], self.PT[1][3])
-                H0_4 = dot(self.H0_6, linalg.inv(dot(H4_5, H5_6)))
-                H2_3 = transform_matrix2(-self.t3[len(self.t3) - 1],
-                                         self.PT[2][1], self.PT[2][2], self.PT[2][3])
-                H1_4 = dot(linalg.inv(H0_1), H0_4)
-                H2_4 = dot(linalg.inv(H1_2), H1_4)
-                H3_4 = dot(linalg.inv(H2_3), H2_4)
-                self.t4.append(math.atan2(H3_4[1][0], H3_4[0][0]))
+            P0_5 = dot(self.H0_6, Md6)
 
-                self.t3.append(
-                    -math.acos(((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3))))
-                self.t2.append(math.atan2(-P1_4[2][0], -P1_4[0][0]) - math.asin(
-                    -self.a3 * sin(self.t3[len(self.t2)]) / sqrt(P1_4xzSQR)))
-                H1_2 = transform_matrix2(
-                    self.t2[len(self.t2) - 1], self.PT[1][1], self.PT[1][2], self.PT[1][3])
-                H0_4 = dot(self.H0_6, linalg.inv(dot(H4_5, H5_6)))
-                H2_3 = transform_matrix2(-self.t3[len(self.t3) - 1],
-                                         self.PT[2][1], self.PT[2][2], self.PT[2][3])
-                H1_4 = dot(linalg.inv(H0_1), H0_4)
-                H2_4 = dot(linalg.inv(H1_2), H1_4)
-                H3_4 = dot(linalg.inv(H2_3), H2_4)
-                self.t4.append(math.atan2(H3_4[1][0], H3_4[0][0]))
+            R = (sqrt(square(P0_5[1][0]) + square(P0_5[0][0])))
 
-        for f in range(2, 4):
-            H0_1 = transform_matrix2(
-                self.t1[1], self.PT[0][1], self.PT[0][2], self.PT[0][3])
-            H4_5 = transform_matrix2(
-                self.t5[f], self.PT[4][1], self.PT[4][2], self.PT[4][3])
-            Md4 = [[0],
-                   [0],
-                   [0],
-                   [1]]
-            invH0_6 = linalg.inv(self.H0_6)
-            Tt1 = [[cos(self.t1[1]), sin(self.t1[1]), 0, 0],
-                   [-sin(self.t1[1]), cos(self.t1[1]), 0, 0],
-                   [0, 0, 1, -self.d1]]
-            if sin(self.t5[f]) == 0:
-                self.t6.append(0)
-            elif sin(self.t5[f]) != 0:
-                self.t6.append(math.atan2(
-                    ((-(invH0_6[1][0] * sin(self.t1[1])) + (invH0_6[1]
-                     [1] * cos(self.t1[1]))) / sin(self.t5[f])),
-                    (((invH0_6[0][0] * sin(self.t1[1])) - (invH0_6[0][1] * cos(self.t1[1]))) / sin(self.t5[f]))))
-            H5_6 = transform_matrix2(
-                self.t6[f], self.PT[5][1], self.PT[5][2], self.PT[5][3])
-            P0_4 = dot(dot(self.H0_6, linalg.inv(dot(H4_5, H5_6))), Md4)
-            P1_4 = dot(Tt1, P0_4)
-            P1_4xzSQR = float(square(P1_4[0][0]) + square(P1_4[2][0]))
-            if -1 <= ((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3)) <= 1:
-                self.t3.append(
-                    math.acos(((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3))))
+            val = math.atan2(P0_5[1][0], P0_5[0][0]) + \
+                math.acos(self.d4 / R) + pi / 2
+            # Angles get added to list
+            if -0.005 < val < 0.005:
+                self.t1.append(0)
+            else:
+                self.t1.append(val)
 
-                self.t2.append(math.atan2(-P1_4[2][0], -P1_4[0][0]) - math.asin(
-                    -self.a3 * sin(self.t3[len(self.t2)]) / sqrt(P1_4xzSQR)))
-                H1_2 = transform_matrix2(
-                    self.t2[len(self.t2) - 1], self.PT[1][1], self.PT[1][2], self.PT[1][3])
-                H0_4 = dot(self.H0_6, linalg.inv(dot(H4_5, H5_6)))
-                H2_3 = transform_matrix2(-self.t3[len(self.t3) - 1],
-                                         self.PT[2][1], self.PT[2][2], self.PT[2][3])
-                H1_4 = dot(linalg.inv(H0_1), H0_4)
-                H2_4 = dot(linalg.inv(H1_2), H1_4)
-                H3_4 = dot(linalg.inv(H2_3), H2_4)
-                self.t4.append(math.atan2(H3_4[1][0], H3_4[0][0]))
+            val = math.atan2(P0_5[1][0], P0_5[0][0]) - \
+                math.acos(self.d4 / R) + pi / 2
+            if -0.005 < val < 0.005:
+                self.t1.append(0)
+            else:
+                self.t1.append(val)
 
-                self.t3.append(
-                    -math.acos(((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3))))
+            val = (self.H0_6[0][3] * sin(self.t1[0]) - self.H0_6[1]
+                   [3] * cos(self.t1[0]) - self.d4) / self.d6
 
-                self.t2.append(math.atan2(-P1_4[2][0], -P1_4[0][0]) - math.asin(
-                    -self.a3 * sin(self.t3[len(self.t2)]) / sqrt(P1_4xzSQR)))
-                H1_2 = transform_matrix2(
-                    self.t2[len(self.t2) - 1], self.PT[1][1], self.PT[1][2], self.PT[1][3])
-                H0_4 = dot(self.H0_6, linalg.inv(dot(H4_5, H5_6)))
-                H2_3 = transform_matrix2(-self.t3[len(self.t3) - 1],
-                                         self.PT[2][1], self.PT[2][2], self.PT[2][3])
-                H1_4 = dot(linalg.inv(H0_1), H0_4)
-                H2_4 = dot(linalg.inv(H1_2), H1_4)
-                H3_4 = dot(linalg.inv(H2_3), H2_4)
-                self.t4.append(math.atan2(H3_4[1][0], H3_4[0][0]))
-        # except Exception as e:
-        #    print(e)
+            if 1 > val > -1:
+                self.t5.append(
+                    math.acos(
+                        (self.H0_6[0][3] * sin(self.t1[0]) - self.H0_6[1][3] * cos(self.t1[0]) - self.d4) / self.d6))
+                self.t5.append(
+                    -math.acos(
+                        (self.H0_6[0][3] * sin(self.t1[0]) - self.H0_6[1][3] * cos(self.t1[0]) - self.d4) / self.d6))
+            elif val > 1 > val - 0.005 and val > 0:
+                self.t5.append(math.acos(val))  # should these be val?
+                self.t5.append(math.acos(val))
+            elif val + 0.005 > -1 > val and val < 0:
+                self.t5.append(math.acos(-val))
+                self.t5.append(math.acos(-val))
+
+            val = (self.H0_6[0][3] * sin(self.t1[1]) - self.H0_6[1]
+                   [3] * cos(self.t1[1]) - self.d4) / self.d6
+            if 1 > val > -1:
+                self.t5.append(
+                    math.acos(
+                        (self.H0_6[0][3] * sin(self.t1[1]) - self.H0_6[1][3] * cos(self.t1[1]) - self.d4) / self.d6))
+                self.t5.append(
+                    -math.acos(
+                        (self.H0_6[0][3] * sin(self.t1[1]) - self.H0_6[1][3] * cos(self.t1[1]) - self.d4) / self.d6))
+            elif val > 1 > val - 0.005 and val > 0:
+                self.t5.append(math.acos(val))
+                self.t5.append(math.acos(val))
+            elif val + 0.005 > -1 > val and val < 0:
+                self.t5.append(math.acos(-val))
+                self.t5.append(math.acos(-val))
+
+            for g in range(2):
+                H0_1 = transform_matrix2(
+                    self.t1[0], self.PT[0][1], self.PT[0][2], self.PT[0][3])
+                H4_5 = transform_matrix2(
+                    self.t5[g], self.PT[4][1], self.PT[4][2], self.PT[4][3])
+                Md4 = [[0],
+                       [0],
+                       [0],
+                       [1]]
+                invH0_6 = linalg.inv(self.H0_6)
+                Tt1 = [[cos(self.t1[0]), sin(self.t1[0]), 0, 0],
+                       [-sin(self.t1[0]), cos(self.t1[0]), 0, 0],
+                       [0, 0, 1, -self.d1]]
+                if sin(self.t5[g]) == 0:
+                    self.t6.append(0)
+                elif sin(self.t5[g]) != 0:
+                    self.t6.append(math.atan2(
+                        ((-(invH0_6[1][0] * sin(self.t1[0])) + (invH0_6[1]
+                                                                [1] * cos(self.t1[0]))) / sin(self.t5[g])),
+                        (((invH0_6[0][0] * sin(self.t1[0])) - (invH0_6[0][1] * cos(self.t1[0]))) / sin(self.t5[g]))))
+                H5_6 = transform_matrix2(
+                    self.t6[g], self.PT[5][1], self.PT[5][2], self.PT[5][3])
+                P0_4 = dot(dot(self.H0_6, linalg.inv(dot(H4_5, H5_6))), Md4)
+                P1_4 = dot(Tt1, P0_4)
+                P1_4xzSQR = float(square(P1_4[0][0]) + square(P1_4[2][0]))
+                if -1 <= ((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3)) <= 1:
+                    self.t3.append(
+                        math.acos(((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3))))
+                    self.t2.append(math.atan2(-P1_4[2][0], -P1_4[0][0]) - math.asin(
+                        -self.a3 * sin(self.t3[len(self.t2)]) / sqrt(P1_4xzSQR)))
+                    H1_2 = transform_matrix2(
+                        self.t2[len(self.t2) - 1], self.PT[1][1], self.PT[1][2], self.PT[1][3])
+                    H0_4 = dot(self.H0_6, linalg.inv(dot(H4_5, H5_6)))
+                    H2_3 = transform_matrix2(-self.t3[len(self.t3) - 1],
+                                             self.PT[2][1], self.PT[2][2], self.PT[2][3])
+                    H1_4 = dot(linalg.inv(H0_1), H0_4)
+                    H2_4 = dot(linalg.inv(H1_2), H1_4)
+                    H3_4 = dot(linalg.inv(H2_3), H2_4)
+                    self.t4.append(math.atan2(H3_4[1][0], H3_4[0][0]))
+
+                    self.t3.append(
+                        -math.acos(((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3))))
+                    self.t2.append(math.atan2(-P1_4[2][0], -P1_4[0][0]) - math.asin(
+                        -self.a3 * sin(self.t3[len(self.t2)]) / sqrt(P1_4xzSQR)))
+                    H1_2 = transform_matrix2(
+                        self.t2[len(self.t2) - 1], self.PT[1][1], self.PT[1][2], self.PT[1][3])
+                    H0_4 = dot(self.H0_6, linalg.inv(dot(H4_5, H5_6)))
+                    H2_3 = transform_matrix2(-self.t3[len(self.t3) - 1],
+                                             self.PT[2][1], self.PT[2][2], self.PT[2][3])
+                    H1_4 = dot(linalg.inv(H0_1), H0_4)
+                    H2_4 = dot(linalg.inv(H1_2), H1_4)
+                    H3_4 = dot(linalg.inv(H2_3), H2_4)
+                    self.t4.append(math.atan2(H3_4[1][0], H3_4[0][0]))
+
+            for f in range(2, 4):
+                H0_1 = transform_matrix2(
+                    self.t1[1], self.PT[0][1], self.PT[0][2], self.PT[0][3])
+                H4_5 = transform_matrix2(
+                    self.t5[f], self.PT[4][1], self.PT[4][2], self.PT[4][3])
+                Md4 = [[0],
+                       [0],
+                       [0],
+                       [1]]
+                invH0_6 = linalg.inv(self.H0_6)
+                Tt1 = [[cos(self.t1[1]), sin(self.t1[1]), 0, 0],
+                       [-sin(self.t1[1]), cos(self.t1[1]), 0, 0],
+                       [0, 0, 1, -self.d1]]
+                if sin(self.t5[f]) == 0:
+                    self.t6.append(0)
+                elif sin(self.t5[f]) != 0:
+                    self.t6.append(math.atan2(
+                        ((-(invH0_6[1][0] * sin(self.t1[1])) + (invH0_6[1]
+                                                                [1] * cos(self.t1[1]))) / sin(self.t5[f])),
+                        (((invH0_6[0][0] * sin(self.t1[1])) - (invH0_6[0][1] * cos(self.t1[1]))) / sin(self.t5[f]))))
+                H5_6 = transform_matrix2(
+                    self.t6[f], self.PT[5][1], self.PT[5][2], self.PT[5][3])
+                P0_4 = dot(dot(self.H0_6, linalg.inv(dot(H4_5, H5_6))), Md4)
+                P1_4 = dot(Tt1, P0_4)
+                P1_4xzSQR = float(square(P1_4[0][0]) + square(P1_4[2][0]))
+                if -1 <= ((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3)) <= 1:
+                    self.t3.append(
+                        math.acos(((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3))))
+
+                    self.t2.append(math.atan2(-P1_4[2][0], -P1_4[0][0]) - math.asin(
+                        -self.a3 * sin(self.t3[len(self.t2)]) / sqrt(P1_4xzSQR)))
+                    H1_2 = transform_matrix2(
+                        self.t2[len(self.t2) - 1], self.PT[1][1], self.PT[1][2], self.PT[1][3])
+                    H0_4 = dot(self.H0_6, linalg.inv(dot(H4_5, H5_6)))
+                    H2_3 = transform_matrix2(-self.t3[len(self.t3) - 1],
+                                             self.PT[2][1], self.PT[2][2], self.PT[2][3])
+                    H1_4 = dot(linalg.inv(H0_1), H0_4)
+                    H2_4 = dot(linalg.inv(H1_2), H1_4)
+                    H3_4 = dot(linalg.inv(H2_3), H2_4)
+                    self.t4.append(math.atan2(H3_4[1][0], H3_4[0][0]))
+
+                    self.t3.append(
+                        -math.acos(((P1_4xzSQR - square(self.a2) - square(self.a3)) / (2 * self.a2 * self.a3))))
+
+                    self.t2.append(math.atan2(-P1_4[2][0], -P1_4[0][0]) - math.asin(
+                        -self.a3 * sin(self.t3[len(self.t2)]) / sqrt(P1_4xzSQR)))
+                    H1_2 = transform_matrix2(
+                        self.t2[len(self.t2) - 1], self.PT[1][1], self.PT[1][2], self.PT[1][3])
+                    H0_4 = dot(self.H0_6, linalg.inv(dot(H4_5, H5_6)))
+                    H2_3 = transform_matrix2(-self.t3[len(self.t3) - 1],
+                                             self.PT[2][1], self.PT[2][2], self.PT[2][3])
+                    H1_4 = dot(linalg.inv(H0_1), H0_4)
+                    H2_4 = dot(linalg.inv(H1_2), H1_4)
+                    H3_4 = dot(linalg.inv(H2_3), H2_4)
+                    self.t4.append(math.atan2(H3_4[1][0], H3_4[0][0]))
+        except Exception as e:
+            print(e)
 
     # determination of arm pose vertices via forward kinematics, given angle vals
 
