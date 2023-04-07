@@ -10,7 +10,8 @@ import sys
 import socket
 import pickle
 from IKEngine import IKSixR
-import copy
+import time
+# import copy
 
 
 def normalize_quaternion(quat):
@@ -241,8 +242,8 @@ class Visualizer(object):
                 robot.draw_limbs(tbn=7)
                 # decent
                 # robot.draw_limbs(tbn=8) nah
-                print(str(robot.rtnposeang(1, 1)*57.29578) + " "+str(robot.rtnposeang(2, 6)*57.29578)+" "+str(robot.rtnposeang(
-                    3, 6)*57.29578)+" "+str(robot.rtnposeang(4, 6)*57.29578)+" "+str(robot.rtnposeang(5, 3)*57.29578)+" "+str(robot.rtnposeang(6, 3)*57.29578))
+                print(str(robot.rtnposeang(1, 1)*57.29578+180) + " "+str(robot.rtnposeang(2, 6)*57.29578+180)+" "+str(robot.rtnposeang(
+                    3, 6)*-57.29578+115)+" "+str(robot.rtnposeang(4, 6)*57.29578+180)+" "+str(robot.rtnposeang(5, 3)*57.29578+180)+" "+str(robot.rtnposeang(6, 3)*57.29578+180))
             except Exception as e:
                 print(e)
             # except IndexError:
@@ -309,13 +310,14 @@ def orthonormalize_matrix(M):
 
 def send(sok):
     while True:
+        time.sleep(60/1000)
         selfpose = shared_memory.SharedMemory(name='pose')
         pose = np.ndarray((1, 7), dtype=np.float64)
         desiredpose = np.ndarray(
             (1, 7), dtype=np.float64, buffer=selfpose.buf)
         # if self.pfilter:
         #    print("filtered")
-        pose += 0.005 * (desiredpose - pose)
+        pose += 0.05 * (desiredpose - pose)
         # else:
         #    pose = copy.copy(desiredpose)
         posecopy = pose
@@ -562,12 +564,12 @@ def main():
         pose.close()
         pose.unlink()
     try:
-        ethernet = False
+        ethernet = True
         viz = True
 
         if ethernet:
             sok = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            ip = "169.254.123.224"
+            ip = "169.254.96.16"
             port = 5005
             serverAddress = (ip, port)
             sok.connect(serverAddress)
