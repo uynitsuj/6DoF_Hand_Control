@@ -13,6 +13,33 @@ from IKEngine import IKSixR
 import copy
 
 
+def normalize_quaternion(quat):
+    norm = np.linalg.norm(quat)
+    return tuple(q / norm for q in quat)
+
+
+def quaternion_to_se3(quat):
+    w, x, y, z = quat
+    Nq = w*w + x*x + y*y + z*z
+    if Nq < np.finfo(float).eps:
+        raise ValueError("Input quaternion has zero length.")
+
+    s = 2.0 / Nq
+    xs, ys, zs = x * s, y * s, z * s
+    wx, wy, wz = w * xs, w * ys, w * zs
+    xx, xy, xz = x * xs, x * ys, x * zs
+    yy, yz, zz = y * ys, y * zs, z * zs
+
+    se3 = np.array([
+        [1.0 - (yy + zz), xy - wz, xz + wy, 0],
+        [xy + wz, 1.0 - (xx + zz), yz - wx, 0],
+        [xz - wy, yz + wx, 1.0 - (xx + yy), 0],
+        [0, 0, 0, 1]
+    ])
+
+    return se3
+
+
 class Visualizer(object):
     def __init__(self):
         self.lm3d = []
@@ -162,24 +189,29 @@ class Visualizer(object):
                     pos=knuckle, color=pg.glColor((4, 100)), width=width, antialias=True))
 
                 self.w.addItem(gl.GLScatterPlotItem(
-                    pos=lm3dlist, color=pg.glColor((30, 50)), size=28))
-            '''
+                    pos=lm3dlist, color=pg.glColor((30, 50)), size=28))'''
 
-        pose = np.ndarray((4, 4), dtype=np.float64)
+        quatdisp = np.ndarray((1, 7), dtype=np.float64)
         desiredpose = np.ndarray(
-            (4, 4), dtype=np.float64, buffer=self.pose.buf)
+            (1, 7), dtype=np.float64, buffer=self.pose.buf)
         if self.pfilter:
-            print("filtered")
-            pose += self.pfilter * (desiredpose - pose)
+            # print("filtered")
+            quatdisp += self.pfilter * (desiredpose - quatdisp)
         else:
-            pose = desiredpose
-        if True:
-            print(pose)
+            quatdisp = desiredpose
+        # print(quatdisp)
+        if quatdisp[0][0]:
+            pose = quaternion_to_se3(normalize_quaternion(
+                (quatdisp[0][0], quatdisp[0][1], quatdisp[0][2], quatdisp[0][3])))
+            pose[0][3] = quatdisp[0][4]
+            pose[1][3] = quatdisp[0][5]
+            pose[2][3] = quatdisp[0][6]
+            # print(pose)
             width = 10
             w = [pose[0][3], pose[1][3], pose[2][3]]
-            v1 = [pose[0][0], pose[1][0], pose[2][0]]
-            v2 = [pose[0][1], pose[1][1], pose[2][1]]
-            v3 = [pose[0][2], pose[1][2], pose[2][2]]
+            v1 = [pose[0][0]/10, pose[1][0]/10, pose[2][0]/10]
+            v2 = [pose[0][1]/10, pose[1][1]/10, pose[2][1]/10]
+            v3 = [pose[0][2]/10, pose[1][2]/10, pose[2][2]/10]
             v1 = np.append([w], [np.add(w, v1)], axis=0)
             # print(v1)
             v2 = np.append([w], [np.add(w, v2)], axis=0)
@@ -193,28 +225,31 @@ class Visualizer(object):
             self.w.addItem(gl.GLLinePlotItem(
                 pos=v3, color=pg.glColor((4, 10)), width=width, antialias=True))
 
-        # Inverse Kinematics
-        '''
-        robot = IKSixR(self.w, H06=(
-            pose[0][0], pose[0][1], pose[0][2], pose[0][3], pose[1][0], pose[1][1], pose[1][2], pose[1][3], pose[2][0], pose[2][1], pose[2][2], pose[2][3]))
-        robot.IK()
-        try:
-            # robot.draw_limbs(tbn=1)
-            # robot.draw_limbs(tbn=2)
-            # robot.draw_limbs(tbn=3)
-            # robot.draw_limbs(tbn=4)
-            # robot.draw_limbs(tbn=5)
-            # robot.draw_limbs(tbn=6)
-            # robot.draw_limbs(tbn=7)
-            robot.draw_limbs(tbn=8)
-            print(str(robot.rtnposeang(1, 1)*57.29578+180) + " "+str(robot.rtnposeang(2, 7)*57.29578+360)+" "+str(robot.rtnposeang(
-                3, 7)*57.29578+180)+" "+str(robot.rtnposeang(4, 7)*57.29578+180)+" "+str(robot.rtnposeang(5, 3)*57.29578+180)+" "+str(robot.rtnposeang(6, 3)*57.29578+180))
+            # Inverse Kinematics
 
-        except IndexError:
-            print(" Out of config space")
+            robot = IKSixR(self.w, H06=(
+                pose[0][0], pose[0][1], pose[0][2], pose[0][3], pose[1][0], pose[1][1], pose[1][2], pose[1][3], pose[2][0], pose[2][1], pose[2][2], pose[2][3]))
+            robot.IK()
+            try:
+                # robot.draw_limbs(tbn=1) nah
+                # robot.draw_limbs(tbn=2)
+                # decent
+                # robot.draw_limbs(tbn=3) nah
+                # robot.draw_limbs(tbn=4) nah
+                # robot.draw_limbs(tbn=5) nah
+                # robot.draw_limbs(tbn=6) nah
+                robot.draw_limbs(tbn=7)
+                # decent
+                # robot.draw_limbs(tbn=8) nah
+                print(str(robot.rtnposeang(1, 1)*57.29578) + " "+str(robot.rtnposeang(2, 6)*57.29578)+" "+str(robot.rtnposeang(
+                    3, 6)*57.29578)+" "+str(robot.rtnposeang(4, 6)*57.29578)+" "+str(robot.rtnposeang(5, 3)*57.29578)+" "+str(robot.rtnposeang(6, 3)*57.29578))
+            except Exception as e:
+                print(e)
+            # except IndexError:
+            #    print(" Out of config space")
 
-        # print("theta1"+robot.rtnposeang(1, 7) + " "+robot.rtnposeang(2, 7)+" "+robot.rtnposeang(
-        #    3, 7)+" "+robot.rtnposeang(4, 7)+" "+robot.rtnposeang(5, 7)+" "+robot.rtnposeang(6, 7))'''
+            # print("theta1"+robot.rtnposeang(1, 7) + " "+robot.rtnposeang(2, 7)+" "+robot.rtnposeang(
+            #    3, 7)+" "+robot.rtnposeang(4, 7)+" "+robot.rtnposeang(5, 7)+" "+robot.rtnposeang(6, 7))'''
 
     def animation(self, pfilter):
         self.pfilter = pfilter
@@ -224,28 +259,74 @@ class Visualizer(object):
         self.pose = shared_memory.SharedMemory(name='pose')
         timer = QtCore.QTimer()
         timer.timeout.connect(self.update)
-        timer.start(1)
+        timer.start(40)
         self.start()
+
+
+def so3_to_quaternion(R):
+    """
+    Convert a rotation matrix R in SO(3) to a quaternion.
+    """
+    tr = np.trace(R)
+    if tr > 0:
+        S = np.sqrt(tr + 1.0) * 2  # S=4*qw
+        qw = 0.25 * S
+        qx = (R[2, 1] - R[1, 2]) / S
+        qy = (R[0, 2] - R[2, 0]) / S
+        qz = (R[1, 0] - R[0, 1]) / S
+    elif (R[0, 0] > R[1, 1]) and (R[0, 0] > R[2, 2]):
+        S = np.sqrt(1.0 + R[0, 0] - R[1, 1] - R[2, 2]) * 2  # S=4*qx
+        qw = (R[2, 1] - R[1, 2]) / S
+        qx = 0.25 * S
+        qy = (R[0, 1] + R[1, 0]) / S
+        qz = (R[0, 2] + R[2, 0]) / S
+    elif R[1, 1] > R[2, 2]:
+        S = np.sqrt(1.0 + R[1, 1] - R[0, 0] - R[2, 2]) * 2  # S=4*qy
+        qw = (R[0, 2] - R[2, 0]) / S
+        qx = (R[0, 1] + R[1, 0]) / S
+        qy = 0.25 * S
+        qz = (R[1, 2] + R[2, 1]) / S
+    else:
+        S = np.sqrt(1.0 + R[2, 2] - R[0, 0] - R[1, 1]) * 2  # S=4*qz
+        qw = (R[1, 0] - R[0, 1]) / S
+        qx = (R[0, 2] + R[2, 0]) / S
+        qy = (R[1, 2] + R[2, 1]) / S
+        qz = 0.25 * S
+    return np.array([qw, qx, qy, qz])
+
+
+def orthonormalize_matrix(M):
+    u1 = M[:, 0]
+    u2 = M[:, 1] - np.dot(M[:, 1], u1) * u1
+    u3 = M[:, 2] - np.dot(M[:, 2], u1) * u1 - np.dot(M[:, 2], u2) * u2
+
+    u1 /= np.linalg.norm(u1)
+    u2 /= np.linalg.norm(u2)
+    u3 /= np.linalg.norm(u3)
+
+    return np.column_stack((u1, u2, u3))
 
 
 def send(sok):
     while True:
         selfpose = shared_memory.SharedMemory(name='pose')
-        pose = np.ndarray((4, 4), dtype=np.float64)
+        pose = np.ndarray((1, 7), dtype=np.float64)
         desiredpose = np.ndarray(
-            (4, 4), dtype=np.float64, buffer=selfpose.buf)
+            (1, 7), dtype=np.float64, buffer=selfpose.buf)
         # if self.pfilter:
         #    print("filtered")
-        pose += 0.05 * (desiredpose - pose)
+        pose += 0.005 * (desiredpose - pose)
         # else:
         #    pose = copy.copy(desiredpose)
         posecopy = pose
         # print("Memory size of numpy array in bytes:",
         #      pose.size * pose.itemsize)
-        posecopy = posecopy.tolist()
+        # posecopy = posecopy.tolist()
         data_string = pickle.dumps(posecopy)
         # message = arr.encode()
-        if pose[3][3]:
+        # print("posecopy")
+        # print(posecopy)
+        if pose[0][0]:
             # print(pose[3][3])
             sok.sendall(data_string)
 
@@ -288,7 +369,7 @@ def find_orthonormal_frame(outshm, pfilter: bool):
                 v2 = pinky - \
                     np.dot((np.dot(v1.T, pinky)/np.dot(v1.T, v1)), v1)
                 try:
-                    v2 = v2/np.linalg.norm(v2)/10
+                    v2 = -v2/np.linalg.norm(v2)/10
                 except:
                     print("Divide by zero probably lol")
 
@@ -296,7 +377,7 @@ def find_orthonormal_frame(outshm, pfilter: bool):
                 v2l = pinkyl - \
                     np.dot((np.dot(v1l.T, pinkyl)/np.dot(v1l.T, v1l)), v1l)
                 try:
-                    v2l = v2l/np.linalg.norm(v2l)/10
+                    v2l = -v2l/np.linalg.norm(v2l)/10
                 except:
                     print("Divide by zero probably lol")
 
@@ -304,7 +385,7 @@ def find_orthonormal_frame(outshm, pfilter: bool):
                 v2r = pinkyr - \
                     np.dot((np.dot(v1r.T, pinkyr)/np.dot(v1r.T, v1r)), v1r)
                 try:
-                    v2r = v2r/np.linalg.norm(v2r)/10
+                    v2r = -v2r/np.linalg.norm(v2r)/10
                 except:
                     print("Divide by zero probably lol")
 
@@ -326,23 +407,29 @@ def find_orthonormal_frame(outshm, pfilter: bool):
                 except:
                     print("Divide by zero probably lol")
 
-                pose1 = [[v1[0], v2[0], v3[0], wrist[0]], [
-                    v1[1], v2[1], v3[1], wrist[1]], [v1[2], v2[2], v3[2], wrist[2]], [0, 0, 0, 1]]
+                pose1 = [[v1[0], v2[0], v3[0]], [
+                    v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
                 pose1 = np.array(pose1)
 
-                posel = [[v1l[0], v2l[0], v3l[0], wrist[0]], [
-                    v1l[1], v2l[1], v3l[1], wrist[1]], [v1l[2], v2l[2], v3l[2], wrist[2]], [0, 0, 0, 1]]
+                posel = [[v1l[0], v2l[0], v3l[0]], [
+                    v1l[1], v2l[1], v3l[1]], [v1l[2], v2l[2], v3l[2]]]
                 posel = np.array(posel)
 
-                poser = [[v1r[0], v2r[0], v3r[0], wrist[0]], [
-                    v1r[1], v2r[1], v3r[1], wrist[1]], [v1r[2], v2r[2], v3r[2], wrist[2]], [0, 0, 0, 1]]
+                poser = [[v1r[0], v2r[0], v3r[0]], [
+                    v1r[1], v2r[1], v3r[1]], [v1r[2], v2r[2], v3r[2]]]
                 poser = np.array(poser)
 
                 pose = np.mean([pose1, posel, poser], axis=0)
-
+                pose = orthonormalize_matrix(pose)
+                quat = so3_to_quaternion(pose)
+                # print(quat)
+                quatdisp = [quat[0], quat[1], quat[2],
+                            quat[3], wrist[0], wrist[1], wrist[2]]
+                quatdisp = np.array(quatdisp)
+                # print(quatdisp)
                 buffer = np.ndarray(
-                    pose.shape, dtype=np.float64, buffer=outshm.buf)
-                buffer[:] = pose[:]
+                    quatdisp.shape, dtype=np.float64, buffer=outshm.buf)
+                buffer[:] = quatdisp[:]
 
 
 def stereo_process(outshm, mtx, b) -> None:
@@ -475,7 +562,7 @@ def main():
         pose.close()
         pose.unlink()
     try:
-        ethernet = True
+        ethernet = False
         viz = True
 
         if ethernet:
