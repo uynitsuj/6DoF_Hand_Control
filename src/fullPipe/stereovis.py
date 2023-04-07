@@ -69,7 +69,6 @@ class Visualizer(object):
                 lm3dlist = desired
             if lm3dlist.tolist():
 
-                # print(lm3dlist)
                 width = 10
 
                 # Thumb
@@ -152,8 +151,6 @@ class Visualizer(object):
                     3, 6)*-57.29578+115)+" "+str(robot.rtnposeang(4, 6)*57.29578+180)+" "+str(robot.rtnposeang(5, 3)*57.29578+180)+" "+str(robot.rtnposeang(6, 3)*57.29578+180))
             except Exception as e:
                 print(e)
-            # except IndexError:
-            #    print(" Out of config space")
 
     def animation(self, pfilter):
         self.pfilter = pfilter
@@ -218,7 +215,7 @@ def find_orthonormal_frame(outshm, pfilter: bool):
     desired = np.ndarray((21, 3), dtype=np.float64, buffer=lm3dshm.buf)
     desiredil = np.ndarray((21, 3), dtype=np.float64, buffer=lm3dil.buf)
     desiredir = np.ndarray((21, 3), dtype=np.float64, buffer=lm3dir.buf)
-    # print(desired)
+
     while True:
         if pfilter:
             lm3dlist += 0.01 * (desired - lm3dlist)
@@ -228,11 +225,10 @@ def find_orthonormal_frame(outshm, pfilter: bool):
             lm3dlist = desired
             lm3dillist = desiredil
             lm3dirlist = desiredir
-        # print(lm3dlist)
         if lm3dlist.tolist():
             # Wrist
             wrist = lm3dlist[0]
-            # print(wrist)
+
             # Index
             index1 = (lm3dlist[5] - lm3dlist[0])
             indexl = (lm3dillist[5] - lm3dillist[0])
@@ -299,11 +295,11 @@ def find_orthonormal_frame(outshm, pfilter: bool):
                 pose = np.mean([pose1, posel, poser], axis=0)
                 pose = orthonormalize_matrix(pose)
                 quat = so3_to_quaternion(pose)
-                # print(quat)
+
                 quatdisp = [quat[0], quat[1], quat[2],
                             quat[3], wrist[0], wrist[1], wrist[2]]
                 quatdisp = np.array(quatdisp)
-                # print(quatdisp)
+
                 buffer = np.ndarray(
                     quatdisp.shape, dtype=np.float64, buffer=outshm.buf)
                 buffer[:] = quatdisp[:]
@@ -341,14 +337,14 @@ def stereo_process(outshm, mtx, b) -> None:
     while True:
         lmlist1 = np.ndarray((21, 2), dtype=np.int32, buffer=shm1.buf)
         lmlist2 = np.ndarray((21, 2), dtype=np.int32, buffer=shm2.buf)
-        # print(lmlist1)
+
         # iterate and calculate disparity between corresponding landmarks
         xyz = []
         if lmlist1.tolist() and lmlist2.tolist():
             lmcat = np.concatenate(
                 (np.array(lmlist1), np.array(lmlist2)), axis=1)
             for idx, lm in enumerate(lmcat):
-                # comput_manye disparity for each landmark, then find x, y, z
+                # compute disparity for each landmark, then find x, y, z
                 ur = lm[0]
                 vr = lm[1]
                 ul = lm[2]
@@ -361,7 +357,6 @@ def stereo_process(outshm, mtx, b) -> None:
                 z = b*fx/(d)
                 xyz.append([-x, y, -z])
         xyz = np.array(xyz)
-        # print(xyz)
 
         buffer = np.ndarray(xyz.shape, dtype=np.float64, buffer=outshm.buf)
         buffer[:] = xyz[:]
