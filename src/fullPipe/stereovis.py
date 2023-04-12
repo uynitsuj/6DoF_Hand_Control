@@ -33,22 +33,23 @@ class Visualizer(object):
     def setup(self):
         gsz = 1
         gsp = .1
-        gx = gl.GLGridItem(color=(255, 255, 255, 60))
+        gx = gl.GLGridItem(color=(0, 0, 0, 60))
         gx.setSize(gsz, gsz, gsz)
         gx.setSpacing(gsp, gsp, gsp)
         gx.rotate(90, 0, 1, 0)
         gx.translate(-gsz/2, 0, gsz/2)
         self.w.addItem(gx)
-        gy = gl.GLGridItem(color=(255, 255, 255, 60))
+        gy = gl.GLGridItem(color=(0, 0, 0, 60))
         gy.setSize(gsz, gsz, gsz)
         gy.setSpacing(gsp, gsp, gsp)
         gy.rotate(90, 1, 0, 0)
         gy.translate(0, -gsz/2, gsz/2)
         self.w.addItem(gy)
-        gz = gl.GLGridItem(color=(255, 255, 255, 100))
+        gz = gl.GLGridItem(color=(0, 0, 0, 100))
         gz.setSize(gsz, gsz, gsz)
         gz.setSpacing(gsp, gsp, gsp)
         self.w.addItem(gz)
+        self.w.setBackgroundColor('w')
 
     def start(self):
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
@@ -73,29 +74,29 @@ class Visualizer(object):
 
                 # Thumb
                 self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[0:5], color=pg.glColor((4, 100)), width=width, antialias=True))
+                    pos=lm3dlist[0:5], color=(1.0, 0.2, 0.6, 0.7), width=width, antialias=True))
                 # Index
                 self.w.addItem(gl.GLLinePlotItem(
-                    pos=np.append([lm3dlist[0]], lm3dlist[5:9], axis=0), color=pg.glColor((4, 100)), width=width, antialias=True))
+                    pos=np.append([lm3dlist[0]], lm3dlist[5:9], axis=0), color=(1.0, 0.2, 0.6, 0.7), width=width, antialias=True))
                 # Middle
                 self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[9:13], color=pg.glColor((4, 100)), width=width, antialias=True))
+                    pos=lm3dlist[9:13], color=(1.0, 0.2, 0.6, 0.7), width=width, antialias=True))
                 # Ring
                 self.w.addItem(gl.GLLinePlotItem(
-                    pos=lm3dlist[13:17], color=pg.glColor((4, 100)), width=width, antialias=True))
+                    pos=lm3dlist[13:17], color=(1.0, 0.2, 0.6, 0.7), width=width, antialias=True))
                 # Pinky
                 self.w.addItem(gl.GLLinePlotItem(
                     pos=np.append([lm3dlist[0]],
-                                  lm3dlist[17:21], axis=0), color=pg.glColor((4, 100)), width=width, antialias=True))
+                                  lm3dlist[17:21], axis=0), color=(1.0, 0.2, 0.6, 0.7), width=width, antialias=True))
                 # Knuckle
                 knuckle = np.append([lm3dlist[5]], [lm3dlist[9]], axis=0)
                 knuckle = np.append(knuckle, [lm3dlist[13]], axis=0)
                 knuckle = np.append(knuckle, [lm3dlist[17]], axis=0)
                 self.w.addItem(gl.GLLinePlotItem(
-                    pos=knuckle, color=pg.glColor((4, 100)), width=width, antialias=True))
+                    pos=knuckle, color=(1.0, 0.2, 0.6, 0.7), width=width, antialias=True))
 
                 self.w.addItem(gl.GLScatterPlotItem(
-                    pos=lm3dlist, color=pg.glColor((2, 50)), size=28))
+                    pos=lm3dlist, color=(0.1, 0.3, 0.5, 0.99), size=23))
 
         quatdisp = np.ndarray((1, 7), dtype=np.float64)
         desiredpose = np.ndarray(
@@ -126,11 +127,11 @@ class Visualizer(object):
             v3 = np.append([w], [np.add(w, v3)], axis=0)
 
             self.w.addItem(gl.GLLinePlotItem(
-                pos=v1, color=pg.glColor((2, 120)), width=width, antialias=True))
+                pos=v1, color=(1.0, 0.0, 0.0, 1.0), width=width, antialias=True))
             self.w.addItem(gl.GLLinePlotItem(
-                pos=v2, color=pg.glColor((4, 50)), width=width, antialias=True))
+                pos=v2, color=(0.0, 1.0, 0.0, 1.0), width=width, antialias=True))
             self.w.addItem(gl.GLLinePlotItem(
-                pos=v3, color=pg.glColor((4, 10)), width=width, antialias=True))
+                pos=v3, color=(0.0, 0.0, 1.0, 1.0), width=width, antialias=True))
 
             # Inverse Kinematics
 
@@ -463,7 +464,7 @@ def main():
         pose.close()
         pose.unlink()
     try:
-        ethernet = True
+        ethernet = False
         viz = True
 
         if ethernet:
