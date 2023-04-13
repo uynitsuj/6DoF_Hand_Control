@@ -33,23 +33,23 @@ class Visualizer(object):
     def setup(self):
         gsz = 1
         gsp = .1
-        gx = gl.GLGridItem(color=(0, 0, 0, 60))
+        gx = gl.GLGridItem(color=(255, 255, 255, 60))
         gx.setSize(gsz, gsz, gsz)
         gx.setSpacing(gsp, gsp, gsp)
         gx.rotate(90, 0, 1, 0)
         gx.translate(-gsz/2, 0, gsz/2)
         self.w.addItem(gx)
-        gy = gl.GLGridItem(color=(0, 0, 0, 60))
+        gy = gl.GLGridItem(color=(255, 255, 255, 60))
         gy.setSize(gsz, gsz, gsz)
         gy.setSpacing(gsp, gsp, gsp)
         gy.rotate(90, 1, 0, 0)
         gy.translate(0, -gsz/2, gsz/2)
         self.w.addItem(gy)
-        gz = gl.GLGridItem(color=(0, 0, 0, 100))
+        gz = gl.GLGridItem(color=(255, 255, 255, 100))
         gz.setSize(gsz, gsz, gsz)
         gz.setSpacing(gsp, gsp, gsp)
         self.w.addItem(gz)
-        self.w.setBackgroundColor('w')
+        self.w.setBackgroundColor('black')
 
     def start(self):
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
