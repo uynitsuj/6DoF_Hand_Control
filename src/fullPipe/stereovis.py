@@ -139,16 +139,7 @@ class Visualizer(object):
                 pose[0][0], pose[0][1], pose[0][2], pose[0][3], pose[1][0], pose[1][1], pose[1][2], pose[1][3], pose[2][0], pose[2][1], pose[2][2], pose[2][3]))
             robot.IK()
             try:
-                # robot.draw_limbs(tbn=1) nah
-                # robot.draw_limbs(tbn=2)
-                # decent
-                # robot.draw_limbs(tbn=3) nah
-                # robot.draw_limbs(tbn=4) nah
-                # robot.draw_limbs(tbn=5) nah
-                # robot.draw_limbs(tbn=6) nah
                 robot.draw_limbs(tbn=7)
-                # decent
-                # robot.draw_limbs(tbn=8) nah
                 print(str(robot.rtnposeang(1, 1)*57.29578+180) + " "+str(robot.rtnposeang(2, 6)*57.29578+180)+" "+str(robot.rtnposeang(
                     3, 6)*-57.29578+115)+" "+str(robot.rtnposeang(4, 6)*57.29578+180)+" "+str(robot.rtnposeang(5, 3)*57.29578+180)+" "+str(robot.rtnposeang(6, 3)*57.29578+180))
             except Exception as e:

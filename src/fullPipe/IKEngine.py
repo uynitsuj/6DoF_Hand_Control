@@ -328,12 +328,6 @@ class IKSixR:
         limb_vectors = [[0, 0, 0]]
         for i, limb, in enumerate(limb_vertices):
             limb_vectors.append(limb_vertices[i])
-        # limb_vectors = [[3, 2, 2], [14, 13, 51], [43, 53, 75]]
-        # x_data = [vector[0] for vector in limb_vectors]
-        # y_data = [vector[1] for vector in limb_vectors]
-        # z_data = [vector[2] for vector in limb_vectors]
-        # self.w.addItem(gl.GLLinePlotItem(
-        #    pos=limb_vectors, color=pg.glColor((3, 50)), width=5, antialias=True))
 
     def rtnposeang(self, j, i):
         if j == 1:

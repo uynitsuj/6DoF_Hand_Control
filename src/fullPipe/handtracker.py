@@ -8,6 +8,9 @@ import numpy as np
 class handTracker():
     # MediaPipe hand tracking pipeline class
     def __init__(self, mode=False, maxHands=1, detectionCon=0.5, modelComplexity=1, trackCon=0.5):
+        """
+        Initializes a handTracker object with the specified parameters.
+        """
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -40,7 +43,7 @@ class handTracker():
         """
         Finds pixel coordinate of the 21 landmarks and returns in a list.
         :param image: cv2.VideoCapture object
-        :param handNo: Hand index TODO: Verify?
+        :param handNo: Hand index
         :param draw: if True, annotates image with landmarks and segments
         :return: A list of 21 landmarks in the format [[0,x_0,y_0],[1,x_1,y_1],...,[20,x_20,y_20]]
         """
@@ -51,6 +54,7 @@ class handTracker():
                 h, w, c = image.shape
                 cx, cy = int(lm.x*w), int(lm.y*h)
                 lmlist.append([cx, cy])
+                # Draw a circle and text to indicate the index finger tip coordinate
                 if draw and id == 8:
                     cv2.circle(image, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
                     txt = "index tip coord: " + \
@@ -60,6 +64,11 @@ class handTracker():
         return lmlist
 
     def find3D(self, handNo=0):
+        """
+        Finds 3D coordinates of the 21 landmarks and returns in a list.
+        :param handNo: Hand index 
+        :return: A list of 21 landmarks in the format [[x_0,y_0,z_0],[x_1,y_1,z_1],...,[x_20,y_20,z_20]]
+        """
         if not self.results.multi_hand_world_landmarks:
             return np.zeros((21, 3))
         lm3dlist = []
