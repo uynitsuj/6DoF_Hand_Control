@@ -19,3 +19,5 @@ The third piece is the driver for the Arduino, ArmControl452.ino. This program r
 
 
 These three programs essential pass information down the chain to the arm. Once they are running there is little to no need to supervise their operation beyond making sure the IK solution is not requesting something impossible. It is important to note that due to time constraints there are very few if any checks on the validity or safety of the data. The arm will attempt to meet whatever position it is told to with no feedback, even if this would cause the arm to physically damage itself. Were we continue development a first step would likely be to add this to prevent damage.
+
+All other files no explicitly mentioned contain function and class definitions that these three use to perform their functions.
