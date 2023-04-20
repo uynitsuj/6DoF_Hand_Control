@@ -1,7 +1,10 @@
-#include <Servo.h>
+/* 
+ *  This is the driver program for the arduino. THe arduino recieves string over serial specifying
+ *  a servo to move and the angle to move to. The program also has the ability to send recived string back
+ *  for verification.
+ */
 
-// Initialize angles for the servos
-int angles[] = {180, 180, 180, 180, 180, 180};
+#include <Servo.h>
 
 // Declare Servo objects for each joint
 Servo j1;
@@ -14,9 +17,9 @@ Servo j6;
 // Initialize variables for serial communication
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
-String commandString = "";
-String i = "";
-bool check = false;
+String commandString = ""; // String specifying which servo to move
+String i = ""; // String specifying position to move to
+bool check = false; // Sets program to send recieved angles back over serial for debugging
 
 void setup() {
   // Start serial communication at 115200 baud rate
@@ -48,7 +51,7 @@ void loop() {
 
     // Move the servos based on the received command
     if (commandString.equals("jone")) {
-      int big = int(2.0 / 3.0 * i.toInt());
+      int big = int(2.0 / 3.0 * i.toInt()); // 2/3 factor to allow 270deg servos to access full range of motion (servo class assumes 180deg)
       j1.write(big);
       if (check) Serial.println(commandString + i);
     }
