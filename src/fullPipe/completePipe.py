@@ -1,3 +1,7 @@
+# This is the driver file for the raspberry pi. It recieves data over ethernet
+# corresponding to a pose that is used for Inverse Kinematics. The IK solution is
+# then sent to the arduino via serial.
+
 import socket
 import pickle
 import numpy as np

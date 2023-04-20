@@ -1,3 +1,7 @@
+# This is a function definition for the driver that manages serial. It applies the
+# proper conversion from radians to degrees then adds an offest so the IK
+# solution matches the physical system.
+
 # Import necessary libraries
 import serial
 import math as m

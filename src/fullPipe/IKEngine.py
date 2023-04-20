@@ -1,3 +1,5 @@
+# This is a class definition and functions which produce IK solutions in
+# radians.
 
 from numpy import *
 # from pyqtgraph.Qt import QtCore, QtWidgets
