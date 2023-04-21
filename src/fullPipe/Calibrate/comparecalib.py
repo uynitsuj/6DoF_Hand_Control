@@ -1,3 +1,4 @@
+# program to compare a calibrated image and the corresponding uncalibrated image
 import cv2
 from multiprocessing import Process, Queue
 import cameracalibrate

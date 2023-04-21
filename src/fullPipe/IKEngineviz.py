@@ -1,3 +1,4 @@
+# This is an Inverse Kinematics class definition with functions producing arm joint angles in radians.
 
 from numpy import *
 from pyqtgraph.Qt import QtCore, QtWidgets

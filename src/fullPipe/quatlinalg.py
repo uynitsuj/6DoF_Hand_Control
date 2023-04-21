@@ -1,3 +1,4 @@
+# this file contains helper functions to convert between different representations
 
 import numpy as np
 

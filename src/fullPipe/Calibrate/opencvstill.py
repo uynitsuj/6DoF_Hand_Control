@@ -1,5 +1,5 @@
-# program to capture single image from webcam in python
-# importing OpenCV library
+# program to capture single still image from webcam in python
+
 import matplotlib.pyplot as plt
 import time
 import cv2

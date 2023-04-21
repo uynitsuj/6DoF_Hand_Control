@@ -1,3 +1,20 @@
+'''
+The first component of the software is the Stereo Computer Vision (CV) and Machine Learning (ML) system, responsible for
+capturing and processing the visual data of the user's hand. The two images are separately processed with a pre-trained
+machine learning pipeline(Mediapipe Handtrack by Google) that infers hand pose, and provides landmark coordinates for 21
+points associated with finger-joints and finger-tips.
+
+Then, the software leverages the landmark coordinates from both images and performs stereo processing. The stereoscopic
+projection algorithm calculates the disparity between the corresponding landmark coordinates from both cameras, and then
+uses the disparity, camera intrinsic matrix, and the camera baseline distance(distance between the two cameras) to
+compute the world-frame 3D positions(x, y, z) of the hand landmarks.
+
+The 3D reconstruction of the hand is then used to calculate an orthonormal frame for the hand pose, which is required for
+the input to the Inverse Kinematics algorithm. The orthonormal frame is calculated using the positions of the index
+finger and pinky, and the resulting SO(3) rotation matrix is converted to a quaternion. The calculated quaternion and
+wrist(x, y, z) position are written to the shared memory, where it is then sent over ethernet to the Raspberry Pi.
+'''
+
 import cv2
 from multiprocessing import Process, shared_memory
 import handtracker

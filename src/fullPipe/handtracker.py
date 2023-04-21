@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# This is an the core hand-tracking class definition with functions to find hand landmark coordinates.
 
 import cv2
 import mediapipe as mp
