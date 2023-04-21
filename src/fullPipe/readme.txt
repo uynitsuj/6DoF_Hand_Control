@@ -15,9 +15,9 @@ The second piece is the driver for IK on the Raspberry Pi, completePipe.py. This
 
 The Arduino
 
-The third piece is the driver for the Arduino, ArmControl452.ino. This program receives the information sent over serial and sets the servos to the commanded position. It performs minor adjustment so the 270° servos can be fully actuated but otherwise simply sets servos.
+The third piece is the driver for the Arduino, ArmControl452.ino. This program receives the information sent over serial and sets the servos to the commanded position. It performs minor adjustments so the 270° servos can be fully actuated but otherwise simply sets servos.
 
 
-These three programs essential pass information down the chain to the arm. Once they are running there is little to no need to supervise their operation beyond making sure the IK solution is not requesting something impossible. It is important to note that due to time constraints there are very few if any checks on the validity or safety of the data. The arm will attempt to meet whatever position it is told to with no feedback, even if this would cause the arm to physically damage itself. Were we continue development a first step would likely be to add this to prevent damage.
+These three programs essentially pass information down the chain to the arm. Once they are running there is little to no need to supervise their operation beyond making sure the IK solution is not requesting something impossible. It is important to note that due to time constraints there are very few if any checks on the validity or safety of the data. The arm will attempt to meet whatever position it is told to with no feedback, even if this would cause the arm to physically damage itself. Were we to continue development a first step would likely be to add this to prevent damage.
 
-All other files no explicitly mentioned contain function and class definitions that these three use to perform their functions.
+All other files not explicitly mentioned contain function and class definitions that these three use to perform their functions.
