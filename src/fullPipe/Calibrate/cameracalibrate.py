@@ -1,4 +1,4 @@
-
+# program to compute the camera calibration matrix
 import cv2
 import numpy as np
 import glob
